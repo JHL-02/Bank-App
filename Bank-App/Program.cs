@@ -6,6 +6,7 @@
         {
             Console.WriteLine("Hello, World!");
             Console.WriteLine("Nadir Test");
+            Console.WriteLine("hej hej daniel");
         }
     }
 }
