@@ -5,7 +5,7 @@
         static void Main(string[] args)
         {
             Console.WriteLine("Hello, World!");
-            Console.WriteLine("Nadir Test");
+            Console.WriteLine("Julia test");
         }
     }
 }
