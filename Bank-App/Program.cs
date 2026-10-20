@@ -6,7 +6,8 @@
         static void Main(string[] args)
         {
             
-            Transactions();
+            //Transactions();
+            TransactionToOthers();
         }
 
         public static void Transactions()
@@ -61,10 +62,44 @@
                     }
                 }
             }
-            
 
+        }
+        public static void TransactionToOthers()
+        {
+            Dictionary<string, string> bankUser1 = new Dictionary<string, string>();
+            Dictionary<string, string> bankUser2 = new Dictionary<string, string>();
+            string user1 = "Daniel";
+            string user2 = "Joakim";
 
+            string bankId1 = "1996";
+            string bankId2 = "1993";
+            decimal user1Balance = 500;
+            decimal user2Balance = 300;
 
+            bankUser1.Add(user1, bankId1);
+            bankUser2.Add(user2, bankId2);
+
+            Console.WriteLine($"{user1} vill skicka pengar till {user2}");
+
+            Console.WriteLine($"skriv in {user2} konto nummer");
+
+            string input = Console.ReadLine();
+
+            if (input == bankId2 && bankUser2.ContainsValue(bankId2))
+            {
+                Console.WriteLine("Hur mycket pengar vill du skicka?");
+                string tranferAmount = Console.ReadLine();
+                decimal amount = decimal.Parse(tranferAmount);
+
+                user2Balance += amount;
+                user1Balance -= amount;
+
+                Console.WriteLine(user2Balance + " " + user1Balance);
+            }
+            else
+            {
+                Console.WriteLine("Fel inmatning");
+            }
         }
     }
 }
