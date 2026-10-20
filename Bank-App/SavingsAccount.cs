@@ -65,13 +65,13 @@
             // som administratör vill jag kunna sätta regler för hur låneräntor ska beräknas beroende på olika faktorer(te.x användarens kredivärdighet)
             // man ska kunna välja olika räntor vid menyn?
             public decimal AdjustCreditRate()
-        {
+            {
             Console.WriteLine($"Nuvarande ränta: {creditRate}. Anpassa ränta efter kreditvärdighet." +
                 $"1  Öka räntenivå." +
                 $"2. Minska räntenivå." +
                 $"3. Valfri räntemängd." +
                 $"4. Avsluta.");
-
+            
             int userMenuOutput;
             while (!int.TryParse(Console.ReadLine(), out userMenuOutput))
             {
@@ -79,13 +79,21 @@
             }
             switch (userMenuOutput)
             {
-                case 1:
+                    case 1:
+                    Console.WriteLine("Ange räntemängd som skall adderas.");
+                    CheckUserInput();
+                    creditRate += userMenuOutput;
                     break;
+
                 case 2:
+                    Console.WriteLine("Ange räntemängd som skall reduceras.");
+                    CheckUserInput();
+                    creditRate -= userMenuOutput;
                     break;
+
                 case 3:
-                    decimal adminAddCreditRate = 0.0m;
-                    Console.WriteLine("Ange räntemängd");
+                    creditRate = 0.0m;
+                    Console.WriteLine("Ange en ny räntemängd till privatlån:");
                     CheckUserInput();
                     creditRate += userMenuOutput;
                     break;
