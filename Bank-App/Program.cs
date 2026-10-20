@@ -5,7 +5,10 @@
         
         static void Main(string[] args)
         {
-            
+
+            SavingsAccount User1 = new SavingsAccount("Nadir", 1005, 25000, 100);
+            Console.WriteLine(User1.Balance);
+            AdjustCreditRate();
             Transactions();
         }
 
