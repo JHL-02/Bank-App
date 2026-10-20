@@ -1,24 +1,23 @@
 ﻿namespace Bank_App
 {
-    internal abstract class Menu
+    internal class Menu
     {
         protected List<MenuOption> Options { get; } = new List<MenuOption>();
+        private string Title { get; }
         private string LeaveMenuString { get; }
-
-        protected Menu(string leaveMenuString = "Tillbaka.")
+        public Menu(List<MenuOption> options, string title, string leaveMenuString = "Tillbaka.")
         {
+            Title = title;
             LeaveMenuString = leaveMenuString;
-
-            InitilizeOptions();
+            Options.AddRange(options);
         }
 
-        protected abstract void InitilizeOptions();
-
-        public void Display()
+        public MenuResult Display()
         {
-            bool exit = false;
-            while (!exit)
+            MenuResult menuResult = MenuResult.Continue;
+            while (true)
             {
+                Console.WriteLine($"---{Title}---");
                 for (int i = 0; i < Options.Count; i++)
                 {
                     Console.WriteLine($"{i + 1}. {Options[i].Title}");
@@ -41,11 +40,14 @@
 
                 if (userPick == Options.Count + 1)
                 {
-                    exit = true;
+                    return MenuResult.Exit;
                 }
-                else
+
+                menuResult = Options[userPick - 1].Execute();
+
+                if (menuResult != MenuResult.Continue)
                 {
-                    Options[userPick - 1].Execute();
+                    return menuResult;
                 }
             }
         }

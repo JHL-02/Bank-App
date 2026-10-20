@@ -2,21 +2,16 @@
 {
     internal class UserDatabase
     {
-        private readonly List<User> Users = new List<User>();
-
-        public List<User> GetUsers()
-        {
-            return Users;
-        }
-
+        private readonly List<User> _users = new List<User>();
+        public IReadOnlyCollection<User> Accounts => _users.AsReadOnly();
         public bool AddUser(string username, string password)
         {
-            if (Users.Any(u => u.Username == username))
+            if (_users.Any(u => u.Username == username))
             {
                 return false;
             }
 
-            Users.Add(new User(username, password));
+            _users.Add(new User(username, password));
             return true;
         }
 
@@ -28,11 +23,11 @@
                 return false;
             }
 
-            return Users.Remove(user);
+            return _users.Remove(user);
         }
         public User? GetUserWithUsername(string username)
         {
-            return Users.Find(u => u.Username == username);
+            return _users.Find(u => u.Username == username);
         }
     }
 }
