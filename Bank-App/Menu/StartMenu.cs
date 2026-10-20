@@ -1,4 +1,4 @@
-﻿namespace Bank_App
+﻿namespace Bank_App.Menu
 {
     internal sealed class StartMenu : Menu
     {
