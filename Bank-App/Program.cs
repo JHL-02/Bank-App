@@ -9,7 +9,7 @@
             SavingsAccount User1 = new SavingsAccount("Nadir", 1005, 25000, 100); // Skapar en ny subklass. 
             Console.WriteLine(User1.Balance); // skriver ut kreditbalansen, vilket är 0 från början. 
             User1.AdjustCreditRate(); // Kallar till adjustcreditrate metoden i savingsklass. 
-            Transactions();
+            Console.WriteLine(User1.loanCreditRate);
         }
 
         public static void Transactions()
