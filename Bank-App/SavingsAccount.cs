@@ -8,10 +8,6 @@
         {
 
         }
-        public override void Transactions(Account targetedAccount, decimal transferAmount)
-        {
-            base.Transactions(targetedAccount, transferAmount);
-        }
 
         // Kapital
         public decimal userSavings { get; protected set; } // Användarens pengar på sparkonto. 
