@@ -1,10 +1,13 @@
-﻿namespace Bank_App
+﻿using System.Drawing;
+
+namespace Bank_App
 {
     internal class Menu
     {
         protected List<MenuOption> Options { get; } = new List<MenuOption>();
         private string Title { get; }
         private string LeaveMenuString { get; }
+        private ConsoleColor defaultColor = ConsoleColor.Cyan;
         public Menu(List<MenuOption> options, string title, string leaveMenuString = "Tillbaka.")
         {
             Title = title;
@@ -17,12 +20,24 @@
             MenuResult menuResult = MenuResult.Continue;
             while (true)
             {
-                Console.WriteLine($"---{Title}---");
+                DisplayMenuHeader(Title, defaultColor);
                 for (int i = 0; i < Options.Count; i++)
                 {
-                    Console.WriteLine($"{i + 1}. {Options[i].Title}");
+                    if (Options[i].Color is ConsoleColor color)
+                    {
+                        Console.ForegroundColor = color;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                    }
+                    Console.WriteLine($"| {i + 1}. {Options[i].Title, -21} |");
                 }
-                Console.WriteLine($"{Options.Count + 1}. {LeaveMenuString}.");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"| {Options.Count + 1}. {LeaveMenuString, -21} |");
+                Console.ForegroundColor = defaultColor;
+                Console.WriteLine("+--------------------------+");
+                Console.ResetColor();
 
                 int userPick;
 
@@ -46,10 +61,18 @@
                 menuResult = Options[userPick - 1].Execute();
 
                 if (menuResult != MenuResult.Continue)
-                {
+                { 
                     return menuResult;
                 }
             }
+        }
+        private static void DisplayMenuHeader(string title, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine("+--------------------------+");
+            Console.WriteLine($"| {title, -24} |");
+            Console.WriteLine("+--------------------------+");
+            Console.ResetColor();
         }
     }
 }
