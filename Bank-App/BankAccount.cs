@@ -4,10 +4,16 @@
     {
         public decimal Balance { get; protected set; }
         public string Name { get; protected set; }
-        
+        public const int MaxNameLength = 20;
+
         public BankAccount(string name)
         {
-            Name = name;
+            if (name.Trim().Length > MaxNameLength)
+            {
+                throw new ArgumentOutOfRangeException(name);
+            }
+
+            Name = name.Trim();
             Balance = 0.0m;
         }
 

@@ -16,7 +16,7 @@ namespace Bank_App
 
         private bool AddAccount(string name)
         {
-            if (_accounts.Any(a => a.Name == name))
+            if (_accounts.Any(a => a.Name == name) || name.Length > BankAccount.MaxNameLength)
             {
                 return false;
             }
@@ -31,8 +31,32 @@ namespace Bank_App
 
         private MenuResult UserCreateAccount()
         {
-            Console.WriteLine("Ange ett namn för det nya kontot:");
-            if (AddAccount(UserInput.GetString()))
+            Console.WriteLine($"Ange ett namn för det nya kontot (max {BankAccount.MaxNameLength} tecken, inga mellanslag):");
+
+            string input;
+            string proposedName;
+            while (true)
+            {
+                input = UserInput.GetString("Du behöver skriva in något ett giltigt kontonamn.");
+                proposedName = input.Trim();
+
+                if (proposedName.Length <= BankAccount.MaxNameLength)
+                {
+                    break;
+                }
+
+                Console.WriteLine($"Ditt namn är längre än {BankAccount.MaxNameLength} tecken.");
+            }
+
+            Console.WriteLine($"Är du säker på kontonamnet \"{proposedName}\"?");
+            if (!UserInput.GetYesOrNo())
+            {
+                Console.WriteLine("Avbryter.");
+                return MenuResult.Continue;
+            }
+            
+
+            if (AddAccount(proposedName))
             {
                 Console.WriteLine("Ditt konto har skapats.");
                 UserInput.WaitForUserConfirm();
@@ -55,7 +79,7 @@ namespace Bank_App
 
                 foreach (BankAccount account in _accounts)
                 {
-                    menuOptions.Add(new MenuOption($"Konto info om konto {account.Name}", () => DisplayAccountMenu(account)));
+                    menuOptions.Add(new MenuOption($"Konto: {account.Name}", () => DisplayAccountInfoMenu(account)));
                 }
 
                 Menu accountMenu = new Menu(menuOptions, "Kontohantering");

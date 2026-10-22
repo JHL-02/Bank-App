@@ -43,7 +43,7 @@ namespace Bank_App
 
                 while (true)
                 {
-                    userPick = UserInput.GetInt("Du kan bara skriva heltal.");
+                    userPick = UserInput.GetInt();
 
                     if (userPick >= 1 && userPick <= Options.Count + 1)
                     {
