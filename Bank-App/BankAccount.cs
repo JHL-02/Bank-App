@@ -26,5 +26,19 @@
                 Balance -= amount;
             }
         }
+        public virtual void Transactions(BankAccount targetedAccount, decimal transferAmount)
+        {
+            if (transferAmount > Balance || Balance <= 0)
+            {
+                Console.WriteLine("För litet saldo");
+            }
+            else
+            {
+                Balance -= transferAmount;
+                targetedAccount.Balance += transferAmount;
+
+            }
+        }
+
     }
 }
