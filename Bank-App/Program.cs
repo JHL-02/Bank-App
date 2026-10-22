@@ -5,6 +5,18 @@
         
         static void Main(string[] args)
         {
+            //Login code
+            /*
+            var database = new UserDatabase();
+            database.AddUser("JL", "password123");
+            
+            var login = new Login(database);
+            login.TryLogin();
+
+            Console.WriteLine("Succees?");
+            */
+
+            
             Bank.UserDatabase.AddUser("StandardUser", "1234");
 
             var startMenu = new Menu(new List<MenuOption>
@@ -19,6 +31,7 @@
             
             //Transactions();
             TransactionToOthers();
+            
         }
 
         public static void Transactions()
