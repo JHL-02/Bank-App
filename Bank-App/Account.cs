@@ -8,9 +8,12 @@ namespace Bank_App
     {
         public decimal Balance { get; protected set; }
         public string Name { get; protected set; }
-        public Account(string name)
+        public int Banknumber { get; protected set; }
+        public Account(string name, int banknumber)
         {
             Name = name;
+            Banknumber = banknumber;
+
         }
     }
 }

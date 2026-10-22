@@ -2,83 +2,130 @@
 {
     internal class SavingsAccount : Account
     {
-        //Sparkonto och ränta: Som användare vill jag kunna öppna sparkonto i banken och när jag sätter in dem få se hur mycket ränta jag kommer kunna få på pengarna jag sätter in.  - KLAR
-        //Lån och räntekostnad: Som användare vill jag kunna låna pengar av banken och direkt få se hur mycket ränta jag kommer behöva betala på det lånet. - KLAR
+        // Sparkonto
         protected List<SavingsAccount> savingAccountsList = new List<SavingsAccount>();
-        public SavingsAccount(string name, int banknumber) : base(name)
+        public SavingsAccount(string name, int banknumber) : base(name, banknumber)
         {
 
         }
 
-        //  Lån och räntekostnad: Som användare vill jag kunna låna pengar av banken och direkt få se hur mycket ränta jag kommer behöva betala på det lånet.
-        //  Kreditgräns(Max 5x): Som bankägare vill jag begränsa hur mycket varje kund kan låna av banken så att de maximalt kan låna 5 ggr de pengar de redan har hos banken.
-
-        private int loanLimit = 0;
+        // Kapital
         public decimal userSavings { get; protected set; } // Användarens pengar på sparkonto. 
         public decimal userBalance { get; protected set; } // Användarens pengar på privatkonto. 
-        public decimal userCreditScore { get; private set; }  = 100m; // Standard kreditvärdighet för nya kunder. 
+        public decimal userLoanDebt { get; private set; } // Användarens skuld hos banken.
+
+        // Ränta & Kreditvärdighet
+        public int userCreditScore { get; private set; }  = 100; // Standard kreditvärdighet för nya kunder. 
         public decimal savingsAccountRate { get; private set; } = 0.02m; // Standard sparränta för alla kunder. 2%
-        public decimal userExtraCreditRate { get; private set; } = 0.05m; // Högre räntevärde för en lägre kreditvärdighet.
+        public decimal loanExtraCreditRate { get; private set; } = 0.05m; // Högre räntevärde för en lägre kreditvärdighet.
         public decimal loanCreditRate { get; private set; } = 0.03m; // Standard lånränta på lånet. 3%
+        
+        // Sparränta
         public void ShowSavingsInterest()
         {
-            decimal yearlyReturn = userSavings * savingsAccountRate;
-            Console.WriteLine($"Sparräntan är {savingsAccountRate:P} och ger dig en avkastning per år: {yearlyReturn:C}");
-        }
-        public void UserLoan(decimal loanAmount)
-        {
-            decimal creditLimit = (userSavings + userBalance) * 5;
-            decimal yearlyInterest = loanAmount * CalculateCreditRate(); // Årsränta på privatlån. 
-            decimal loanSum = yearlyInterest + loanAmount;
-
-            if (loanAmount > creditLimit || userCreditScore <= 20)
+            if (userSavings > 0)
             {
-                Console.WriteLine("Ditt lån har inte blivit godkänt av banken.");
+                decimal yearlyReturn = userSavings * savingsAccountRate;
+                Console.WriteLine($"Bankens sparränta: {savingsAccountRate:P}. Avkastning per år:{yearlyReturn:C}.");
             }
             else
             {
-                loanLimit++;
-                userCreditScore = (userCreditScore - 20);
-                Console.WriteLine($"Din ansökan för ett belopp på {loanAmount} har blivit godkänd. Årsränta: {yearlyInterest}. Totalkostnad: {loanSum}.");
-                Console.WriteLine("Vilket konto vill du att pengarna skall överföras till? \n1. Privatkonto 2. Sparkonto");
-
-                switch (IntInput())
-                {
-                    case 1:
-                        userBalance += loanAmount;
-                        Console.WriteLine("Pengarna har överförts till Privatkontot.");
-                        break;
-                    case 2:
-                        userSavings += loanAmount;
-                        Console.WriteLine($"Pengarna har överförts till Sparkontot. Nytt saldo: {userSavings}");
-
-                        break;
-                    default:
-                        Console.WriteLine("Ogiltigt val. Välj 1 eller 2.");
-                        break;
-                }
+                Console.WriteLine("Det finns inga pengar på ditt sparkonto.");
             }
 
         }
 
-        // som administratör vill jag kunna sätta regler för hur låneräntor ska beräknas beroende på olika faktorer(te.x användarens kredivärdighet)
+        // Privatlån
+
+        public void UserLoan(decimal loanAmount)
+        {
+            decimal creditLimit = (userSavings + userBalance) * 5 - userLoanDebt;
+            if (creditLimit < 0m)
+            {
+                creditLimit = 0m;
+            }
+            decimal yearlyInterest = loanAmount * CalculateCreditRate();
+            decimal loanSum = yearlyInterest + loanAmount;
+
+            if (loanAmount > creditLimit || userCreditScore <= 20 || loanAmount <= 0m)
+            {
+                Console.WriteLine("Ditt lån har inte blivit godkänt av banken.");
+                return;
+            }
+
+            Console.WriteLine($"Din ansökan för ett belopp på {loanAmount:C} har blivit godkänd.");
+            Console.WriteLine($"Årsränta: {yearlyInterest:C}. Totalkostnad: {loanSum:C}.");
+
+            int accountChoice;
+
+            do
+            {
+                Console.WriteLine("Vilket konto vill du att pengarna ska överföras till?");
+                Console.WriteLine("1. Privatkonto");
+                Console.WriteLine("2. Sparkonto");
+
+                accountChoice = IntInput();
+
+                if (accountChoice != 1 && accountChoice != 2)
+                {
+                    Console.WriteLine("Ogiltigt val. Välj 1 eller 2.");
+                }
+
+            } while (accountChoice != 1 && accountChoice != 2);
+
+            switch (accountChoice)
+            {
+                case 1:
+                    userBalance += loanAmount;
+                    Console.WriteLine("Pengarna har överförts till privatkontot.");
+                    break;
+
+                case 2:
+                    userSavings += loanAmount;
+                    Console.WriteLine($"Pengarna har överförts till sparkontot. Nytt saldo: {userSavings:C}");
+                    break;
+            }
+            userLoanDebt += loanAmount;
+            userCreditScore -= 20;
+        }
+
+        // Kreditränta
+        public decimal CalculateCreditRate()
+        {
+            if (userCreditScore < 60)
+            {
+                return loanExtraCreditRate;
+            }
+            return loanCreditRate;
+        }
+
+        // Justera kreditränta. (Admin)
         public decimal AdjustCreditRate()
         {
-            Console.WriteLine($"Standardränta: {loanCreditRate:P} för alla kunder. Varje ny kund börjar med :{userCreditScore} i kreditvärdighet. " +
-                $"1  Öka räntenivå baserat på kreditvärdighet. " + // se över denna
-                $"2. Minska räntenivå baserat på kreditvärdighet. " + // se över denna
-                $"3. Valfri räntemängd." + // BRA
-                $"4. Avsluta.");
+            Console.WriteLine(
+                $"Standardränta: {loanCreditRate:P} för alla kunder.\n" +
+                $"Ny kund börjar med: {userCreditScore} i kreditvärdighet.\n" +
+                "1. Öka räntenivå baserat på kreditvärdighet.\n" +
+                "2. Minska räntenivå baserat på kreditvärdighet.\n" +
+                "3. Valfri räntemängd.\n" +
+                "4. Avsluta.");
 
             switch (IntInput())
             {
                 case 1:
-                     Console.WriteLine($"Räntan baseras på kreditvärdighet. Kunder med kreditvärdighet under 60 poäng får {userExtraCreditRate:P}% ränta istället för {loanCreditRate:P}%.\n1. Addera mer på räntan. 2. Avsluta.");
+                     Console.WriteLine(
+                         $"Räntan baseras på kreditvärdighet. Kunder med kreditvärdighet under 60 poäng får {loanExtraCreditRate:P} ränta istället för {loanCreditRate:P}.\n" +
+                         $"1. Addera mer på räntan.\n" +
+                         $"2. Avsluta.\n");
                      switch(IntInput())
                     {
                         case 1:
-                            Console.WriteLine("Ange ny räntemängd: (Decimalform 0.00)");
-                            userExtraCreditRate += DecimalInput();
+                            Console.WriteLine("Ange hur mycket räntan ska ökas (t.ex. 0.01 för 1 procentenhet):");
+
+                            decimal increase = DecimalInput();
+                            loanExtraCreditRate += increase;
+
+                            Console.WriteLine($"Den nya extra räntan är {loanExtraCreditRate:P}.");
                             break;
                         case 2:
                             break;
@@ -86,23 +133,40 @@
                      break;
 
                 case 2:
-                    Console.WriteLine($"Räntan baseras på kreditvärdighet. Kunder med kreditvärdighet under 60 poäng får {userExtraCreditRate:P}% ränta istället för {loanCreditRate:P}%.\n1. Reducera mer på räntan. 2. Avsluta.");
+                    Console.WriteLine(
+                        $"Räntan baseras på kreditvärdighet. Kunder med kreditvärdighet under 60 poäng får {loanExtraCreditRate:P} ränta istället för {loanCreditRate:P}.\n" +
+                        $"1. Reducera mer på räntan.\n" +
+                        $"2. Avsluta.\n");
                     switch (IntInput())
                     {
                         case 1:
-                            Console.WriteLine("Ange ny räntemängd: (Decimalform 0.00)");
-                            userExtraCreditRate -= DecimalInput();
+                            Console.WriteLine("Ange hur mycket räntan ska minskas (t.ex. 0.01 för 1 procentenhet):");
+                            decimal reduction = DecimalInput();
+                            decimal newExtraRate = loanExtraCreditRate - reduction;
+
+                            if (newExtraRate >= 0m)
+                            {
+                                loanExtraCreditRate = newExtraRate;
+                                Console.WriteLine($"Den nya extra räntan är {loanExtraCreditRate:P}.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Räntan kan inte bli negativ.");
+                            }
                             break;
                         case 2:
+                            break;
+                        default:
+                            Console.WriteLine("Vänligen ange ett nummer mellan 1-2.");
                             break;
                     }
                     break; 
                 case 3:
-                    Console.WriteLine("Ange ett nytt standardvärde för räntan:");
+                    Console.WriteLine("Ange ett nytt standardvärde för standardränta hos banken:");
                     decimal newRate = DecimalInput();
-                    if (newRate <= 100)
+                    if (newRate <= 1m)
                     {
-                        loanCreditRate = newRate; // Använder värdet du precis samlade in
+                        loanCreditRate = newRate;
                     }
                     else
                     {
@@ -114,9 +178,10 @@
                     break;
             }
             return loanCreditRate;
-
         }
-        public int IntInput() // Int input för menyer med felhantering.
+
+        // Felinmatning
+        public int IntInput()
         {
             int userMenuOutput;
             while (!int.TryParse(Console.ReadLine(), out userMenuOutput))
@@ -125,7 +190,7 @@
             }
             return userMenuOutput;
         }
-        public decimal DecimalInput() // Decimal input för menyer med felhantering.
+        public decimal DecimalInput() 
         {
             decimal userDecimalInput;
             while (!decimal.TryParse(Console.ReadLine(), out userDecimalInput) || userDecimalInput < 0m)
@@ -133,14 +198,6 @@
                 Console.WriteLine("Felaktig inmatning. Ange ett giltigt decimaltal (t.ex. 0.03):");
             }
             return userDecimalInput;
-        }
-        public decimal CalculateCreditRate()
-        {
-            if (userCreditScore < 60)
-            {
-                return userExtraCreditRate;
-            }
-            return loanCreditRate;
         }
     }
 }
