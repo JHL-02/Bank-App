@@ -121,17 +121,14 @@
                     {
                         case 1:
                             Console.WriteLine("Ange hur mycket räntan ska ökas (t.ex. 0.01 för 1 procentenhet):");
-
                             decimal increase = DecimalInput();
                             loanExtraCreditRate += increase;
-
                             Console.WriteLine($"Den nya extra räntan är {loanExtraCreditRate:P}.");
                             break;
                         case 2:
                             break;
                     }
                      break;
-
                 case 2:
                     Console.WriteLine(
                         $"Räntan baseras på kreditvärdighet. Kunder med kreditvärdighet under 60 poäng får {loanExtraCreditRate:P} ränta istället för {loanCreditRate:P}.\n" +
@@ -157,7 +154,7 @@
                         case 2:
                             break;
                         default:
-                            Console.WriteLine("Vänligen ange ett nummer mellan 1-2.");
+                            Console.WriteLine("Felaktig inmatning. Vänligen ange ett nummer mellan 1-2.");
                             break;
                     }
                     break; 
@@ -176,6 +173,9 @@
                 case 4:
                     Console.Clear();
                     break;
+                default:
+                    Console.WriteLine("Felaktig inmatning. Vänligen ange ett nummer mellan 1-4.");
+                    break;
             }
             return loanCreditRate;
         }
@@ -186,7 +186,7 @@
             int userMenuOutput;
             while (!int.TryParse(Console.ReadLine(), out userMenuOutput))
             {
-                Console.WriteLine("Felaktig inmatning.");
+                Console.WriteLine("Felaktig inmatning. Ange ett giltigt heltal: ");
             }
             return userMenuOutput;
         }
