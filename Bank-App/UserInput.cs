@@ -80,5 +80,12 @@ namespace Bank_App
                 }
             }
         }
+
+        public static void WaitForUserConfirm(string message = "Tryck på valfri knapp för att fortsätta.")
+        {
+            Console.WriteLine(message);
+
+            Console.ReadKey(true);
+        }
     }
 }
