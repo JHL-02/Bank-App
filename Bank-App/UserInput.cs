@@ -32,11 +32,11 @@ namespace Bank_App
 
                 if (!string.IsNullOrWhiteSpace(input))
                 {
-                    if (input.ToLower() == "ja")
+                    if (input.Trim().ToLower() == "ja")
                     {
                         return true;
                     }
-                    if (input.ToLower() == "nej")
+                    if (input.Trim().ToLower() == "nej")
                     {
                         return false;
                     }
