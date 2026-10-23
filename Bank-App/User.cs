@@ -79,7 +79,7 @@ namespace Bank_App
 
                 foreach (BankAccount account in _accounts)
                 {
-                    menuOptions.Add(new MenuOption($"Konto: {account.Name}", () => DisplayAccountInfoMenu(account)));
+                    menuOptions.Add(new MenuOption($"Konto: {account.Name}", () => DisplayAccountMenu(account)));
                 }
 
                 Menu accountMenu = new Menu(menuOptions, "Kontohantering");
