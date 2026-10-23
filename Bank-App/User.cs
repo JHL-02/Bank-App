@@ -1,4 +1,6 @@
-﻿namespace Bank_App
+﻿using System.Security.Principal;
+
+namespace Bank_App
 {
     internal class User
     {
@@ -14,7 +16,7 @@
 
         private bool AddAccount(string name)
         {
-            if (_accounts.Any(a => a.Name == name))
+            if (_accounts.Any(a => a.Name == name) || name.Length > BankAccount.MaxNameLength)
             {
                 return false;
             }
@@ -22,11 +24,39 @@
             _accounts.Add(new BankAccount(name));
             return true;
         }
+        public BankAccount? GetAccountWithName(string name)
+        {
+            return _accounts.Find(a => a.Name == name);
+        }
 
         private MenuResult UserCreateAccount()
         {
-            Console.WriteLine("Ange ett namn för det nya kontot:");
-            if (AddAccount(UserInput.GetString()))
+            Console.WriteLine($"Ange ett namn för det nya kontot (max {BankAccount.MaxNameLength} tecken, inga mellanslag):");
+
+            string input;
+            string proposedName;
+            while (true)
+            {
+                input = UserInput.GetString("Du behöver skriva in något ett giltigt kontonamn.");
+                proposedName = input.Trim();
+
+                if (proposedName.Length <= BankAccount.MaxNameLength)
+                {
+                    break;
+                }
+
+                Console.WriteLine($"Ditt namn är längre än {BankAccount.MaxNameLength} tecken.");
+            }
+
+            Console.WriteLine($"Är du säker på kontonamnet \"{proposedName}\"?");
+            if (!UserInput.GetYesOrNo())
+            {
+                Console.WriteLine("Avbryter.");
+                return MenuResult.Continue;
+            }
+            
+
+            if (AddAccount(proposedName))
             {
                 Console.WriteLine("Ditt konto har skapats.");
                 UserInput.WaitForUserConfirm();
@@ -49,7 +79,7 @@
 
                 foreach (BankAccount account in _accounts)
                 {
-                    menuOptions.Add(new MenuOption($"Konto info om konto {account.Name}", () => DisplayAccountInfoMenu(account)));
+                    menuOptions.Add(new MenuOption($"Konto: {account.Name}", () => DisplayAccountInfoMenu(account)));
                 }
 
                 Menu accountMenu = new Menu(menuOptions, "Kontohantering");
@@ -59,7 +89,7 @@
             return MenuResult.Continue;
         }
 
-        public MenuResult DisplayAccountInfoMenu(BankAccount account)
+        public MenuResult DisplayAccountMenu(BankAccount account)
         {
             Menu accountMenu = new Menu(new List<MenuOption>
             {
@@ -70,7 +100,8 @@
                     Console.WriteLine($"Saldo: {account.Balance}");
                     UserInput.WaitForUserConfirm();
                     return MenuResult.Continue;
-                })
+                }),
+                new MenuOption("Överföra pengar", () => StartUserTransaction(account))
             }, account.Name);
             accountMenu.Display();
 
@@ -82,5 +113,74 @@
         {
             return Password == password;
         }
+        private MenuResult StartUserTransaction(BankAccount account)
+        {
+            Console.WriteLine("Vill du föra över til dig själv?");
+            if (UserInput.GetYesOrNo())
+            {
+                Console.WriteLine("Vilket konto vill du föra över till?");
+                string input = UserInput.GetString();
+
+                if (_accounts.Any(a => a.Name == input))
+                {
+                    BankAccount? targetedAccount = _accounts.Find(a => a.Name == input);
+                    if (targetedAccount != null)
+                    {
+                        Console.WriteLine("Hur mycket vill du föra över?:");
+                        decimal transferAmount = UserInput.GetDecimal("Du behöver skriva in en siffra.");
+
+                        account.Transactions(targetedAccount, transferAmount);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Du har inget konto som heter {input}.");
+                    UserInput.WaitForUserConfirm();
+                }
+            }
+            else
+            {
+                Console.WriteLine("Vilken användare vill du föra över till?");
+                string input = UserInput.GetString();
+
+                User? targetedUser = Bank.UserDatabase.GetUserWithUsername(input);
+                if (targetedUser != null)
+                {
+                    Console.WriteLine("Ange namnet på kontot som du vill föra över till:");
+                    string userAccountTargetString = UserInput.GetString("Felaktig inmatning.");
+
+                    BankAccount? targetedAccount = targetedUser.GetAccountWithName(userAccountTargetString);
+
+                    if (targetedAccount != null)
+                    {
+                        Console.WriteLine("Hur mycket vill du föra över?:");
+                        decimal transferAmount = UserInput.GetDecimal("Du behöver skriva in en siffra.");
+
+                        if (account.Transactions(targetedAccount, transferAmount))
+                        {
+                            Console.WriteLine($"Du förde över {transferAmount} till {targetedAccount.Name}.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Det gick inte att föra över.");
+                        }
+                        UserInput.WaitForUserConfirm();
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Kunde inte hitta något konto med namnet {userAccountTargetString}");
+                        UserInput.WaitForUserConfirm();
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Kunde inte hitta en användare med namnet {input}.");
+                    UserInput.WaitForUserConfirm();
+                }
+            }
+            return MenuResult.Continue;
+        }
+
     }
 }
+

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Bank_App
+﻿namespace Bank_App
 {
     internal static class UserInput
     {
-        public static string GetString(string? invalidInputMessage = null)
+        public static string GetString(string? invalidInputMessage = "Du måste skriva in något.")
         {
             while (true)
             {
@@ -24,7 +20,7 @@ namespace Bank_App
             }
         }
 
-        public static bool GetYesOrNo(string? invalidInputMessage = null)
+        public static bool GetYesOrNo(string? invalidInputMessage = "Du kan bara skriv in (ja/nej)")
         {
             while (true)
             {
@@ -32,11 +28,11 @@ namespace Bank_App
 
                 if (!string.IsNullOrWhiteSpace(input))
                 {
-                    if (input.ToLower() == "ja")
+                    if (input.Trim().ToLower() == "ja")
                     {
                         return true;
                     }
-                    if (input.ToLower() == "nej")
+                    if (input.Trim().ToLower() == "nej")
                     {
                         return false;
                     }
@@ -49,7 +45,7 @@ namespace Bank_App
             }
         }
 
-        public static int GetInt(string? invalidInputMessage = null)
+        public static int GetInt(string? invalidInputMessage = "Du måste skriva in ett heltal.")
         {
             while (true)
             {
@@ -65,7 +61,7 @@ namespace Bank_App
             }
         }
 
-        public static decimal GetDecimal(string? invalidInputMessage = null)
+        public static decimal GetDecimal(string? invalidInputMessage = "Du måste skriva in en siffra.")
         {
             while (true)
             {
