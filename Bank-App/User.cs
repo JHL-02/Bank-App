@@ -108,6 +108,11 @@ namespace Bank_App
             return MenuResult.Continue;
         }
 
+        //Allows other classes to see the password for validation
+        public bool CheckPassword(string password)
+        {
+            return Password == password;
+        }
         private MenuResult StartUserTransaction(BankAccount account)
         {
             Console.WriteLine("Vill du föra över til dig själv?");

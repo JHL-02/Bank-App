@@ -5,6 +5,17 @@
         
         static void Main(string[] args)
         {
+            //Login code
+            /*
+            var database = new UserDatabase();
+            database.AddUser("JL", "password123");
+            
+            var login = new Login(database);
+            login.TryLogin();
+
+            Console.WriteLine("Succees?");
+            */
+            
             Bank.UserDatabase.AddUser("User1", "1234");
             Bank.UserDatabase.AddUser("User2", "1234");
 
