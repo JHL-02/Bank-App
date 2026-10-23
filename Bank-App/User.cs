@@ -14,7 +14,7 @@
 
         private bool AddAccount(string name)
         {
-            if (_accounts.Any(a => a.Name == name) || name.Length > BankAccount.MaxNameLength || _accounts.Count < BankAccount.MaxAccountAmount)
+            if (_accounts.Any(a => a.Name == name) || name.Length > BankAccount.MaxNameLength || _accounts.Count >= BankAccount.MaxAccountAmount)
             {
                 return false;
             }
@@ -75,6 +75,19 @@
         {
             MenuResult menuResult;
 
+            if (this is Admin admin)
+            {
+                Console.WriteLine("Vill du logga in som admin?");
+                if (UserInput.GetYesOrNo())
+                {
+                    Console.WriteLine("Loggar in som admin.");
+                    admin.DisplayAdminMenu();
+                    return MenuResult.Continue;
+                }
+
+                Console.WriteLine("Loggar in som användare.");
+            }
+
             do
             {
                 List<MenuOption> menuOptions = new List<MenuOption>();
@@ -86,7 +99,7 @@
                     menuOptions.Add(new MenuOption($"Konto: {account.Name}", () => DisplayAccountMenu(account)));
                 }
 
-                Menu accountMenu = new Menu(menuOptions, "Kontohantering");
+                Menu accountMenu = new Menu(menuOptions, $"Kontohantering - {Username}");
                 menuResult = accountMenu.Display();
             } while (menuResult == MenuResult.Rebuild);
 
@@ -123,22 +136,18 @@
             if (UserInput.GetYesOrNo())
             {
                 Console.WriteLine("Vilket konto vill du föra över till?");
-                string input = UserInput.GetString();
+                BankAccount? targetedAccount = UserSelectAccount();
 
-                if (_accounts.Any(a => a.Name == input))
+                if (targetedAccount != null)
                 {
-                    BankAccount? targetedAccount = _accounts.Find(a => a.Name == input);
-                    if (targetedAccount != null)
-                    {
-                        Console.WriteLine("Hur mycket vill du föra över?:");
-                        decimal transferAmount = UserInput.GetDecimal("Du behöver skriva in en siffra.");
+                    Console.WriteLine("Hur mycket vill du föra över?:");
+                    decimal transferAmount = UserInput.GetDecimal("Du behöver skriva in en siffra.");
 
-                        account.Transactions(targetedAccount, transferAmount);
-                    }
+                    account.Transactions(targetedAccount, transferAmount);
                 }
                 else
                 {
-                    Console.WriteLine($"Du har inget konto som heter {input}.");
+                    Console.WriteLine($"Inget konto hittades.");
                     UserInput.WaitForUserConfirm();
                 }
             }
@@ -185,6 +194,31 @@
             return MenuResult.Continue;
         }
 
+        public BankAccount? UserSelectAccount()
+        {
+            if (_accounts.Count < 1)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < _accounts.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {_accounts[i].Name}");
+            }
+
+            int input = 0;
+            while (true)
+            {
+                input = UserInput.GetInt();
+                if (input >= 1 && input <= _accounts.Count)
+                {
+                    break;
+                }
+                Console.WriteLine("Felaktig inmatning.");
+            }
+
+            return _accounts[input - 1];
+        }
     }
 }
 
