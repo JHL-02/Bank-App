@@ -4,6 +4,7 @@
     {
         //Allows us to check if user is in UserDatabase
         private UserDatabase _database;
+        public static bool isLockedOut { get; private set; } = false;
 
         public Login(UserDatabase database)
         {
@@ -11,8 +12,13 @@
         }
 
 
-        public bool TryLogin()
+        public User? TryLogin()
         {
+            if (isLockedOut)
+            {
+                return null;
+            }
+
             User? user = null;
 
             int usernameAttempts = 0;
@@ -34,7 +40,8 @@
             if (usernameAttempts >= 3)
             {
                 Console.WriteLine("Du har skrivit fel för många gånger. Försök igen senare.");
-                Environment.Exit(0);
+                isLockedOut = true;
+                return null;
             }
 
             int passwordAttempts = 0;
@@ -43,21 +50,19 @@
                 Console.Write("Lösenord: ");
                 string password = UserInput.GetString();
 
-                if (user.CheckPassword(password))
+                if (user != null && user.CheckPassword(password))
                 {
                     Console.WriteLine();
-                    return true;
+                    return user;
                 }
 
                 passwordAttempts++;
                 Console.WriteLine($"Fel lösenord! Försök kvar: {3 - passwordAttempts}");
             }
             Console.WriteLine("Du har skrivit fel för många gånger. Försök igen senare.");
-            Environment.Exit(0);
+            isLockedOut = true;
 
-            //This is mainly here because otherwise we get an error because not every path returns something
-            //Not ever seen...
-            return false;
+            return null;
         }
     }
 }
