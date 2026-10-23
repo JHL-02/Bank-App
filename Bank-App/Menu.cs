@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace Bank_App
+﻿namespace Bank_App
 {
     internal class Menu
     {
@@ -31,10 +29,10 @@ namespace Bank_App
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
                     }
-                    Console.WriteLine($"| {i + 1}. {Options[i].Title, -21} |");
+                    Console.WriteLine($"| {i + 1}. {Options[i].Title,-21} |");
                 }
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"| {Options.Count + 1}. {LeaveMenuString, -21} |");
+                Console.WriteLine($"| {Options.Count + 1}. {LeaveMenuString,-21} |");
                 Console.ForegroundColor = defaultColor;
                 Console.WriteLine("+--------------------------+");
                 Console.ResetColor();
@@ -61,7 +59,7 @@ namespace Bank_App
                 menuResult = Options[userPick - 1].Execute();
 
                 if (menuResult != MenuResult.Continue)
-                { 
+                {
                     return menuResult;
                 }
             }
@@ -70,7 +68,7 @@ namespace Bank_App
         {
             Console.ForegroundColor = color;
             Console.WriteLine("+--------------------------+");
-            Console.WriteLine($"| {title, -24} |");
+            Console.WriteLine($"| {title,-24} |");
             Console.WriteLine("+--------------------------+");
             Console.ResetColor();
         }
