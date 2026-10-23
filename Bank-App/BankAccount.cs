@@ -5,6 +5,7 @@
         public decimal Balance { get; protected set; }
         public string Name { get; protected set; }
         public const int MaxNameLength = 20;
+        public const int MaxAccountAmount = 10;
 
         public BankAccount(string name)
         {

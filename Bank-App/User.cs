@@ -16,7 +16,7 @@ namespace Bank_App
 
         private bool AddAccount(string name)
         {
-            if (_accounts.Any(a => a.Name == name) || name.Length > BankAccount.MaxNameLength)
+            if (_accounts.Any(a => a.Name == name) || name.Length > BankAccount.MaxNameLength || _accounts.Count < BankAccount.MaxAccountAmount)
             {
                 return false;
             }
@@ -31,6 +31,12 @@ namespace Bank_App
 
         private MenuResult UserCreateAccount()
         {
+            if (_accounts.Count >= BankAccount.MaxAccountAmount)
+            {
+                Console.WriteLine($"Du kan inte skapa mer än {BankAccount.MaxAccountAmount} konton.");
+                UserInput.WaitForUserConfirm();
+            }
+
             Console.WriteLine($"Ange ett namn för det nya kontot (max {BankAccount.MaxNameLength} tecken, inga mellanslag):");
 
             string input;
