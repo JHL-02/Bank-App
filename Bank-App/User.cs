@@ -14,7 +14,7 @@
 
         private bool AddAccount(string name)
         {
-            if (_accounts.Any(a => a.Name == name) || name.Length > BankAccount.MaxNameLength || _accounts.Count < BankAccount.MaxAccountAmount)
+            if (_accounts.Any(a => a.Name == name) || name.Length > BankAccount.MaxNameLength || _accounts.Count >= BankAccount.MaxAccountAmount)
             {
                 return false;
             }
@@ -105,7 +105,8 @@
                     UserInput.WaitForUserConfirm();
                     return MenuResult.Continue;
                 }),
-                new MenuOption("Överföra pengar", () => StartUserTransaction(account))
+                new MenuOption("Överföra pengar", () => StartUserTransaction(account)),
+                new MenuOption("Transaktions historik", () => TransactionHistory(account))
             }, account.Name);
             accountMenu.Display();
 
@@ -181,6 +182,14 @@
                     Console.WriteLine($"Kunde inte hitta en användare med namnet {input}.");
                     UserInput.WaitForUserConfirm();
                 }
+            }
+            return MenuResult.Continue;
+        }
+        private MenuResult TransactionHistory(BankAccount account)
+        {
+            foreach (var transaction in account.transactionsHistory)
+            {
+                Console.WriteLine(transaction);
             }
             return MenuResult.Continue;
         }

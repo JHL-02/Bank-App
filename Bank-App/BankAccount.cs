@@ -7,6 +7,8 @@
         public const int MaxNameLength = 20;
         public const int MaxAccountAmount = 10;
 
+        public List<string> transactionsHistory = new List<string>();
+
         public BankAccount(string name)
         {
             if (name.Trim().Length > MaxNameLength)
@@ -44,6 +46,7 @@
             {
                 Balance -= transferAmount;
                 targetedAccount.Balance += transferAmount;
+                transactionsHistory.Add($"{Name} skickade {transferAmount}kr till {targetedAccount.Name} {DateTime.Now}");
                 return true;
             }
         }
