@@ -12,6 +12,7 @@ namespace Bank_App
        // public DateTime TransactionTime { get; set; }
         
         public List<string> TransactionsHistory = new List<string>();
+        
         public List<(BankAccount Account, decimal Amount, DateTime TransactionTime)> TransactionList = new();
         
 

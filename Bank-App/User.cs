@@ -54,6 +54,7 @@ namespace Bank_App
             }
             bool isSavingsAccount = accountTypeInput == 2;
 
+
             Console.WriteLine($"Ange ett namn för det nya kontot (max {BankAccount.MaxNameLength} tecken, inga mellanslag):");
             string input;
             string proposedName;
