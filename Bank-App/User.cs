@@ -146,7 +146,7 @@
 
                     account.Transactions(targetedAccount, transferAmount);
                 }
-                if (targetedAccount == account)
+                else if (targetedAccount == account)
                 {
                     Console.WriteLine("Du kan inte föra över till samma konto");
                     UserInput.WaitForUserConfirm();
