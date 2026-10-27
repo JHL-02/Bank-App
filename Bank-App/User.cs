@@ -12,13 +12,17 @@
             Password = password;
         }
 
-        private bool AddAccount(string name)
+        private bool AddAccount(string name, bool isSavingsAccount = false)
         {
             if (_accounts.Any(a => a.Name == name) || name.Length > BankAccount.MaxNameLength || _accounts.Count >= BankAccount.MaxAccountAmount)
             {
                 return false;
             }
-
+            if (isSavingsAccount)
+            {
+                _accounts.Add(new SavingsAccount(name));
+                return true;
+            }
             _accounts.Add(new BankAccount(name));
             return true;
         }
@@ -34,9 +38,21 @@
                 Console.WriteLine($"Du kan inte skapa mer än {BankAccount.MaxAccountAmount} konton.");
                 UserInput.WaitForUserConfirm();
             }
+            Console.WriteLine("1. Bankkonto\n2. Sparkonto");
+            int accountTypeInput;
+            while (true)
+            {
+                accountTypeInput = UserInput.GetInt();
+
+                if (accountTypeInput == 1 || accountTypeInput == 2)
+                {
+                    break;
+                }
+                Console.WriteLine("Välj ett alternativ ur listan.");
+            }
+            bool isSavingsAccount = accountTypeInput == 2;
 
             Console.WriteLine($"Ange ett namn för det nya kontot (max {BankAccount.MaxNameLength} tecken, inga mellanslag):");
-
             string input;
             string proposedName;
             while (true)
@@ -60,7 +76,7 @@
             }
 
 
-            if (AddAccount(proposedName))
+            if (AddAccount(proposedName, isSavingsAccount))
             {
                 Console.WriteLine("Ditt konto har skapats.");
                 UserInput.WaitForUserConfirm();
