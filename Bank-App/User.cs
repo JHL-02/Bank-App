@@ -1,4 +1,6 @@
-﻿namespace Bank_App
+﻿using System.Security.Principal;
+
+namespace Bank_App
 {
     internal class User
     {
@@ -69,6 +71,7 @@
             }
 
             Console.WriteLine($"Är du säker på kontonamnet \"{proposedName}\"?");
+
             if (!UserInput.GetYesOrNo())
             {
                 Console.WriteLine("Avbryter.");
@@ -233,20 +236,7 @@
             {
                 Console.WriteLine(transaction);
             }
-            if (account.TransactionList.Count > 0)
-            {
-                Console.WriteLine("\n--- Väntande överföringar ---");
-                foreach (var pending in account.TransactionList)
-                {
-                    Console.WriteLine($"{pending.Amount}kr till {pending.Account.Name}, genomförs kl {pending.TransactionTime:HH:mm:ss}");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Din transaktions historik är tom.");
-                return MenuResult.Continue;
-            }
-
+            
             return MenuResult.Continue;
         }
 
