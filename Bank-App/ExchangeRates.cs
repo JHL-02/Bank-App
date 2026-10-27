@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Bank_App
+﻿namespace Bank_App
 {
     internal class ExchangeRates
     {
@@ -41,7 +38,7 @@ namespace Bank_App
         {
             if (amount < 0)
             {
-                throw new ArgumentException("Amount cannot be negative.");
+                throw new ArgumentException("Summan kan inte vara negativ.");
             }
 
             if (fromCurrency == toCurrency)
