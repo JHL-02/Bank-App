@@ -41,7 +41,7 @@
             string proposedName;
             while (true)
             {
-                input = UserInput.GetString("Du behöver skriva in något ett giltigt kontonamn.");
+                input = UserInput.GetString("Du behöver skriva in ett giltigt kontonamn.");
                 proposedName = input.Trim();
 
                 if (proposedName.Length <= BankAccount.MaxNameLength)
@@ -66,7 +66,7 @@
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Rebuild;
             }
-            Console.WriteLine("Ditt konto kunde inte skapas.");
+            Console.WriteLine("Ditt konto kunde inte skapas då namnet redan används.");
             UserInput.WaitForUserConfirm();
             return MenuResult.Continue;
         }
@@ -157,7 +157,7 @@
 
                     account.Transactions(targetedAccount, transferAmount);
                 }
-                if (targetedAccount == account)
+                else if (targetedAccount == account)
                 {
                     Console.WriteLine("Du kan inte föra över till samma konto");
                     UserInput.WaitForUserConfirm();
@@ -212,16 +212,25 @@
         }
         private MenuResult TransactionHistory(BankAccount account)
         {
-            if (account.transactionsHistory.Count == 0)
+            account.ExecuteTransactions();
+            foreach (var transaction in account.TransactionsHistory)
+            {
+                Console.WriteLine(transaction);
+            }
+            if (account.TransactionList.Count > 0)
+            {
+                Console.WriteLine("\n--- Väntande överföringar ---");
+                foreach (var pending in account.TransactionList)
+                {
+                    Console.WriteLine($"{pending.Amount}kr till {pending.Account.Name}, genomförs kl {pending.TransactionTime:HH:mm:ss}");
+                }
+            }
+            else
             {
                 Console.WriteLine("Din transaktions historik är tom.");
                 return MenuResult.Continue;
             }
-            foreach (var transaction in account.transactionsHistory)
-            {
-                Console.WriteLine(transaction);
-            }
-            
+
             return MenuResult.Continue;
         }
 
