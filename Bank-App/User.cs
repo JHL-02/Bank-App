@@ -114,15 +114,26 @@
                 {
                     Console.WriteLine("------");
                     Console.WriteLine($"Kontonamn: {account.Name}");
-                    Console.WriteLine($"Saldo: {account.Balance}");
+                    Console.WriteLine($"Saldo: {account.getCurrencyDisplayString()}");
                     UserInput.WaitForUserConfirm();
                     return MenuResult.Continue;
                 }),
                 new MenuOption("Överföra pengar", () => StartUserTransaction(account)),
-                new MenuOption("Transaktions historik", () => TransactionHistory(account))
+                new MenuOption("Transaktions historik", () => TransactionHistory(account)),
+                new MenuOption("Ändra valuta", () => UserChangeAccountCurrency(account))
             }, account.Name);
             accountMenu.Display();
 
+            return MenuResult.Continue;
+        }
+
+        private MenuResult UserChangeAccountCurrency(BankAccount account)
+        {
+            Currency? chosenCurrency = UserInput.UserGetObjectFromList(Enum.GetValues<Currency>().ToList<Currency>(), type => type.ToString());
+            if (chosenCurrency.HasValue)
+            {
+                account.setDisplayCurrency(chosenCurrency.Value);
+            }
             return MenuResult.Continue;
         }
 
@@ -223,31 +234,6 @@
             return MenuResult.Continue;
         }
 
-        public BankAccount? UserSelectAccount()
-        {
-            if (_accounts.Count < 1)
-            {
-                return null;
-            }
-
-            for (int i = 0; i < _accounts.Count; i++)
-            {
-                Console.WriteLine($"{i + 1}. {_accounts[i].Name}");
-            }
-
-            int input = 0;
-            while (true)
-            {
-                input = UserInput.GetInt();
-                if (input >= 1 && input <= _accounts.Count)
-                {
-                    break;
-                }
-                Console.WriteLine("Felaktig inmatning.");
-            }
-
-            return _accounts[input - 1];
-        }
+        public BankAccount? UserSelectAccount() => UserInput.UserGetObjectFromList<BankAccount>(_accounts, a => a.Name);
     }
 }
-

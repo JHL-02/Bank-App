@@ -5,6 +5,7 @@ namespace Bank_App
     internal class BankAccount
     {
         public decimal Balance { get; protected set; }
+        public Currency displayCurrency { get; protected set; } = Currency.SEK;
         public string Name { get; protected set; }
         public const int MaxNameLength = 20;
         public const int MaxAccountAmount = 10;
@@ -53,11 +54,16 @@ namespace Bank_App
                 DateTime transferedTime = realTime.AddMinutes(15);
                 Balance -= transferAmount;
                 TransactionList.Add((targetedAccount, transferAmount, transferedTime));
-                targetedAccount.Balance += transferAmount;
                 //TransactionsHistory.Add($"{Name} skickade {transferAmount}kr till {targetedAccount.Name} {transferedTime}");
                 return true;
             }
         }
+      
+        public void setDisplayCurrency(Currency newCurrency)
+        {
+            displayCurrency = newCurrency;
+        }
+      
         public void ExecuteTransactions()
         {
             var transactions = TransactionList.Where(t => t.TransactionTime <= DateTime.Now).ToList();
@@ -68,7 +74,31 @@ namespace Bank_App
                 TransactionsHistory.Add($"{Name} skickade {transaction.Amount}kr till {transaction.Account.Name} {DateTime.Now}");
             }
         }
-        
 
+        public string getCurrencyDisplayString()
+        {
+            string currencyUnit;
+            bool placeUnitBefore = false;
+            switch (displayCurrency)
+            {
+                case Currency.SEK:
+                    currencyUnit = "kr";
+                        break;
+                case Currency.USD:
+                    currencyUnit = "$";
+                    placeUnitBefore = true;
+                    break;
+                case Currency.EUR:
+                    currencyUnit = "€";
+                    placeUnitBefore = true;
+                    break;
+                default:
+                    currencyUnit = "";
+                    break;
+            }
+            decimal convertedBalance = Bank.ExchangeRates.Convert(Balance, Currency.SEK, displayCurrency);
+
+            return placeUnitBefore ? $"{currencyUnit}{convertedBalance}" : $"{convertedBalance}{currencyUnit}";
+        }
     }
 }

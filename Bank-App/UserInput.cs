@@ -83,5 +83,29 @@
 
             Console.ReadKey(true);
         }
+
+        public static T? UserGetObjectFromList<T>(List<T> list, Func<T, string> getName)
+        {
+            if (list.Count < 1)
+            {
+                return default;
+            }
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {getName(list[i])}");
+            }
+
+            int input = 0;
+            while (true)
+            {
+                input = GetInt();
+                if (input >= 1 && input <= list.Count)
+                {
+                    return list[input - 1];
+                }
+                Console.WriteLine("Felaktig inmatning.");
+            }
+        }
     }
 }
