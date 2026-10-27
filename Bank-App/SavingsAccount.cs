@@ -3,7 +3,6 @@
     internal class SavingsAccount : BankAccount
     {
         // Sparkonto
-        protected List<SavingsAccount> savingAccountsList = new List<SavingsAccount>();
         public SavingsAccount(string name) : base(name)
         {
         

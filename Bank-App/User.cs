@@ -14,13 +14,17 @@ namespace Bank_App
             Password = password;
         }
 
-        private bool AddAccount(string name)
+        private bool AddAccount(string name, bool isSavingsAccount = false)
         {
             if (_accounts.Any(a => a.Name == name) || name.Length > BankAccount.MaxNameLength || _accounts.Count >= BankAccount.MaxAccountAmount)
             {
                 return false;
             }
-
+            if (isSavingsAccount)
+            {
+                _accounts.Add(new SavingsAccount(name));
+                return true;
+            }
             _accounts.Add(new BankAccount(name));
             return true;
         }
@@ -36,9 +40,21 @@ namespace Bank_App
                 Console.WriteLine($"Du kan inte skapa mer än {BankAccount.MaxAccountAmount} konton.");
                 UserInput.WaitForUserConfirm();
             }
+            Console.WriteLine("1. Bankkonto\n2. Sparkonto");
+            int accountTypeInput;
+            while (true)
+            {
+                accountTypeInput = UserInput.GetInt();
+
+                if (accountTypeInput == 1 || accountTypeInput == 2)
+                {
+                    break;
+                }
+                Console.WriteLine("Välj ett alternativ ur listan.");
+            }
+            bool isSavingsAccount = accountTypeInput == 2;
 
             Console.WriteLine($"Ange ett namn för det nya kontot (max {BankAccount.MaxNameLength} tecken, inga mellanslag):");
-
             string input;
             string proposedName;
             while (true)
@@ -62,7 +78,8 @@ namespace Bank_App
                 return MenuResult.Continue;
             }
 
-                if (AddAccount(proposedName))
+
+            if (AddAccount(proposedName, isSavingsAccount))
             {
                 Console.WriteLine("Ditt konto har skapats.");
                 UserInput.WaitForUserConfirm();
@@ -116,16 +133,26 @@ namespace Bank_App
                 {
                     Console.WriteLine("------");
                     Console.WriteLine($"Kontonamn: {account.Name}");
-                    Console.WriteLine($"Valuta: {account.Currency}");
-                    Console.WriteLine($"Saldo: {account.Balance}{account.Currency}");
+                    Console.WriteLine($"Saldo: {account.getCurrencyDisplayString()}");
                     UserInput.WaitForUserConfirm();
                     return MenuResult.Continue;
                 }),
                 new MenuOption("Överföra pengar", () => StartUserTransaction(account)),
-                new MenuOption("Transaktions historik", () => TransactionHistory(account))
+                new MenuOption("Transaktions historik", () => TransactionHistory(account)),
+                new MenuOption("Ändra valuta", () => UserChangeAccountCurrency(account))
             }, account.Name);
             accountMenu.Display();
 
+            return MenuResult.Continue;
+        }
+
+        private MenuResult UserChangeAccountCurrency(BankAccount account)
+        {
+            Currency? chosenCurrency = UserInput.UserGetObjectFromList(Enum.GetValues<Currency>().ToList<Currency>(), type => type.ToString());
+            if (chosenCurrency.HasValue)
+            {
+                account.setDisplayCurrency(chosenCurrency.Value);
+            }
             return MenuResult.Continue;
         }
 
@@ -149,7 +176,7 @@ namespace Bank_App
 
                     account.Transactions(targetedAccount, transferAmount);
                 }
-                if (targetedAccount == account)
+                else if (targetedAccount == account)
                 {
                     Console.WriteLine("Du kan inte föra över till samma konto");
                     UserInput.WaitForUserConfirm();
@@ -204,12 +231,8 @@ namespace Bank_App
         }
         private MenuResult TransactionHistory(BankAccount account)
         {
-            if (account.transactionsHistory.Count == 0)
-            {
-                Console.WriteLine("Din transaktions historik är tom.");
-                return MenuResult.Continue;
-            }
-            foreach (var transaction in account.transactionsHistory)
+            account.ExecuteTransactions();
+            foreach (var transaction in account.TransactionsHistory)
             {
                 Console.WriteLine(transaction);
             }
@@ -253,17 +276,23 @@ namespace Bank_App
 
             int input = 0;
             while (true)
+            if (account.TransactionList.Count > 0)
             {
-                input = UserInput.GetInt();
-                if (input >= 1 && input <= _accounts.Count)
+                Console.WriteLine("\n--- Väntande överföringar ---");
+                foreach (var pending in account.TransactionList)
                 {
-                    break;
+                    Console.WriteLine($"{pending.Amount}kr till {pending.Account.Name}, genomförs kl {pending.TransactionTime:HH:mm:ss}");
                 }
-                Console.WriteLine("Felaktig inmatning.");
+            }
+            else
+            {
+                Console.WriteLine("Din transaktions historik är tom.");
+                return MenuResult.Continue;
             }
 
-            return _accounts[input - 1];
+            return MenuResult.Continue;
         }
+
+        public BankAccount? UserSelectAccount() => UserInput.UserGetObjectFromList<BankAccount>(_accounts, a => a.Name);
     }
 }
-
