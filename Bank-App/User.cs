@@ -139,12 +139,17 @@
                 Console.WriteLine("Vilket konto vill du föra över till?");
                 BankAccount? targetedAccount = UserSelectAccount();
 
-                if (targetedAccount != null)
+                if (targetedAccount != null && targetedAccount != account)
                 {
                     Console.WriteLine("Hur mycket vill du föra över?:");
                     decimal transferAmount = UserInput.GetDecimal("Du behöver skriva in en siffra.");
 
                     account.Transactions(targetedAccount, transferAmount);
+                }
+                if (targetedAccount == account)
+                {
+                    Console.WriteLine("Du kan inte föra över till samma konto");
+                    UserInput.WaitForUserConfirm();
                 }
                 else
                 {
