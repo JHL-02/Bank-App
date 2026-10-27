@@ -56,20 +56,13 @@ namespace Bank_App
 
             Console.WriteLine($"Är du säker på kontonamnet \"{proposedName}\"?");
 
-            Currency chosenCurrency = UserSelectCurrency();
-
-            if (AddAccount(proposedName, chosenCurrency))
-
-
-
             if (!UserInput.GetYesOrNo())
             {
                 Console.WriteLine("Avbryter.");
                 return MenuResult.Continue;
             }
 
-
-            if (AddAccount(proposedName))
+                if (AddAccount(proposedName))
             {
                 Console.WriteLine("Ditt konto har skapats.");
                 UserInput.WaitForUserConfirm();
