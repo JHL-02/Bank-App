@@ -1,4 +1,6 @@
-﻿namespace Bank_App
+﻿using System.Transactions;
+
+namespace Bank_App
 {
     internal class BankAccount
     {
@@ -6,8 +8,11 @@
         public string Name { get; protected set; }
         public const int MaxNameLength = 20;
         public const int MaxAccountAmount = 10;
+       // public DateTime TransactionTime { get; set; }
         
-        public List<string> transactionsHistory = new List<string>();
+        public List<string> TransactionsHistory = new List<string>();
+        public List<(BankAccount Account, decimal Amount, DateTime TransactionTime)> TransactionList = new();
+        
 
         public BankAccount(string name)
         {
@@ -44,12 +49,26 @@
             }
             else
             {
+                DateTime realTime = DateTime.Now;
+                DateTime transferedTime = realTime.AddMinutes(15);
                 Balance -= transferAmount;
+                TransactionList.Add((targetedAccount, transferAmount, transferedTime));
                 targetedAccount.Balance += transferAmount;
-                transactionsHistory.Add($"{Name} skickade {transferAmount}kr till {targetedAccount.Name} {DateTime.Now}");
+                //TransactionsHistory.Add($"{Name} skickade {transferAmount}kr till {targetedAccount.Name} {transferedTime}");
                 return true;
             }
         }
+        public void ExecuteTransactions()
+        {
+            var transactions = TransactionList.Where(t => t.TransactionTime <= DateTime.Now).ToList();
+            foreach (var transaction in transactions)
+            {
+                transaction.Account.Deposit(transaction.Amount);
+                TransactionList.Remove(transaction);
+                TransactionsHistory.Add($"{Name} skickade {transaction.Amount}kr till {transaction.Account.Name} {DateTime.Now}");
+            }
+        }
+        
 
     }
 }

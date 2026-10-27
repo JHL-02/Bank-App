@@ -146,7 +146,7 @@
 
                     account.Transactions(targetedAccount, transferAmount);
                 }
-                if (targetedAccount == account)
+                else if (targetedAccount == account)
                 {
                     Console.WriteLine("Du kan inte föra över till samma konto");
                     UserInput.WaitForUserConfirm();
@@ -201,10 +201,20 @@
         }
         private MenuResult TransactionHistory(BankAccount account)
         {
-            foreach (var transaction in account.transactionsHistory)
+            account.ExecuteTransactions();
+            foreach (var transaction in account.TransactionsHistory)
             {
                 Console.WriteLine(transaction);
             }
+            if (account.TransactionList.Count > 0)
+            {
+                Console.WriteLine("\n--- Väntande överföringar ---");
+                foreach (var pending in account.TransactionList)
+                {
+                    Console.WriteLine($"{pending.Amount}kr till {pending.Account.Name}, genomförs kl {pending.TransactionTime:HH:mm:ss}");
+                }
+            }
+
             return MenuResult.Continue;
         }
 
