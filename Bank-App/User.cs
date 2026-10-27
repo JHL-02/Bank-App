@@ -128,10 +128,12 @@ namespace Bank_App
 
         public MenuResult DisplayAccountMenu(BankAccount account)
         {
+            account.ExecuteTransactions();
             Menu accountMenu = new Menu(new List<MenuOption>
             {
                 new MenuOption("Visa info.", () =>
                 {
+                    account.ExecuteTransactions();
                     Console.WriteLine("------");
                     Console.WriteLine($"Kontonamn: {account.Name}");
                     Console.WriteLine($"Saldo: {account.getCurrencyDisplayString()}");
@@ -164,6 +166,7 @@ namespace Bank_App
         }
         private MenuResult StartUserTransaction(BankAccount account)
         {
+            account.ExecuteTransactions();
             Console.WriteLine("Vill du föra över til dig själv?");
             if (UserInput.GetYesOrNo())
             {
@@ -237,7 +240,20 @@ namespace Bank_App
             {
                 Console.WriteLine(transaction);
             }
-            
+            if (account.PendingTransactionsList.Count > 0)
+            {
+                Console.WriteLine("\n--- Väntande överföringar ---");
+                foreach (var pending in account.PendingTransactionsList)
+                {
+                    Console.WriteLine($"{pending.Amount}kr till {account.Name}, genomförs kl {pending.TransactionTime:HH:mm:ss}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Din transaktions historik är tom.");
+                return MenuResult.Continue;
+            }
+
             return MenuResult.Continue;
         }
 
