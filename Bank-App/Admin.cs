@@ -57,14 +57,14 @@
             }
             else
             {
-                Console.WriteLine($"Kontot {username} kunde inte skapas.");
+                Console.WriteLine($"Kontot {username} kunde inte skapas då användarnamnet redan existerar.");
             }
             return MenuResult.Continue;
         }
 
         private MenuResult AddBalance()
         {
-            Console.WriteLine("Vilket användare ska få pengar?");
+            Console.WriteLine("Vilken användare ska få pengar?");
             string userString = UserInput.GetString();
             User? targetedUser = Bank.UserDatabase.GetUserWithUsername(userString);
 
