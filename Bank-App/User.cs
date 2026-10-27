@@ -41,7 +41,7 @@
             string proposedName;
             while (true)
             {
-                input = UserInput.GetString("Du behöver skriva in något ett giltigt kontonamn.");
+                input = UserInput.GetString("Du behöver skriva in ett giltigt kontonamn.");
                 proposedName = input.Trim();
 
                 if (proposedName.Length <= BankAccount.MaxNameLength)
@@ -66,7 +66,7 @@
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Rebuild;
             }
-            Console.WriteLine("Ditt konto kunde inte skapas.");
+            Console.WriteLine("Ditt konto kunde inte skapas då namnet redan används.");
             UserInput.WaitForUserConfirm();
             return MenuResult.Continue;
         }
