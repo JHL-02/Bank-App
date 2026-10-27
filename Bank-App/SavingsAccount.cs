@@ -1,12 +1,12 @@
 ﻿namespace Bank_App
 {
-    internal class SavingsAccount : Account
+    internal class SavingsAccount : BankAccount
     {
         // Sparkonto
         protected List<SavingsAccount> savingAccountsList = new List<SavingsAccount>();
-        public SavingsAccount(string name, int banknumber) : base(name, banknumber)
+        public SavingsAccount(string name) : base(name)
         {
-
+        
         }
 
         // Kapital
@@ -32,7 +32,6 @@
             {
                 Console.WriteLine("Det finns inga pengar på ditt sparkonto.");
             }
-
         }
 
         // Privatlån

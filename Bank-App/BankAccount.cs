@@ -6,7 +6,7 @@
         public string Name { get; protected set; }
         public const int MaxNameLength = 20;
         public const int MaxAccountAmount = 10;
-
+        
         public List<string> transactionsHistory = new List<string>();
 
         public BankAccount(string name)
