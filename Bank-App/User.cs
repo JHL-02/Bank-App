@@ -1,4 +1,6 @@
-﻿namespace Bank_App
+﻿using System.Security.Principal;
+
+namespace Bank_App
 {
     internal class User
     {
@@ -69,6 +71,7 @@
             }
 
             Console.WriteLine($"Är du säker på kontonamnet \"{proposedName}\"?");
+
             if (!UserInput.GetYesOrNo())
             {
                 Console.WriteLine("Avbryter.");
@@ -233,6 +236,46 @@
             {
                 Console.WriteLine(transaction);
             }
+            
+            return MenuResult.Continue;
+        }
+
+        private Currency UserSelectCurrency()
+        {
+            Console.WriteLine("Vilken valuta ska kontot ha?");
+            Currency[] currencies = Enum.GetValues<Currency>();
+
+            for (int i = 0; i < currencies.Length; i++)
+            {
+                Console.WriteLine($"{i + 1}. {currencies[i]}");
+            }
+
+            while (true)
+            {
+                int input = UserInput.GetInt();
+                if (input >= 1 && input <= currencies.Length)
+                {
+                    return currencies[input - 1];
+                }
+                Console.WriteLine("Felaktig inmatning.");
+            }
+        }
+
+
+        public BankAccount? UserSelectAccount()
+        {
+            if (_accounts.Count < 1)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < _accounts.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {_accounts[i].Name}");
+            }
+
+            int input = 0;
+            while (true)
             if (account.TransactionList.Count > 0)
             {
                 Console.WriteLine("\n--- Väntande överföringar ---");
