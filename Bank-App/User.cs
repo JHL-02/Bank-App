@@ -1,4 +1,6 @@
-﻿namespace Bank_App
+﻿using System.Security.Principal;
+
+namespace Bank_App
 {
     internal class User
     {
@@ -53,6 +55,13 @@
             }
 
             Console.WriteLine($"Är du säker på kontonamnet \"{proposedName}\"?");
+
+            Currency chosenCurrency = UserSelectCurrency();
+
+            if (AddAccount(proposedName, chosenCurrency))
+
+
+
             if (!UserInput.GetYesOrNo())
             {
                 Console.WriteLine("Avbryter.");
@@ -114,7 +123,8 @@
                 {
                     Console.WriteLine("------");
                     Console.WriteLine($"Kontonamn: {account.Name}");
-                    Console.WriteLine($"Saldo: {account.Balance}");
+                    Console.WriteLine($"Valuta: {account.Currency}");
+                    Console.WriteLine($"Saldo: {account.Balance}{account.Currency}");
                     UserInput.WaitForUserConfirm();
                     return MenuResult.Continue;
                 }),
@@ -213,6 +223,28 @@
             
             return MenuResult.Continue;
         }
+
+        private Currency UserSelectCurrency()
+        {
+            Console.WriteLine("Vilken valuta ska kontot ha?");
+            Currency[] currencies = Enum.GetValues<Currency>();
+
+            for (int i = 0; i < currencies.Length; i++)
+            {
+                Console.WriteLine($"{i + 1}. {currencies[i]}");
+            }
+
+            while (true)
+            {
+                int input = UserInput.GetInt();
+                if (input >= 1 && input <= currencies.Length)
+                {
+                    return currencies[input - 1];
+                }
+                Console.WriteLine("Felaktig inmatning.");
+            }
+        }
+
 
         public BankAccount? UserSelectAccount()
         {
