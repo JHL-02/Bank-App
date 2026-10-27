@@ -162,6 +162,7 @@ namespace Bank_App
         {
             return Password == password;
         }
+
         private MenuResult StartUserTransaction(BankAccount account)
         {
             Console.WriteLine("Vill du föra över til dig själv?");
@@ -233,6 +234,12 @@ namespace Bank_App
         private MenuResult TransactionHistory(BankAccount account)
         {
             account.ExecuteTransactions();
+
+            if (account.TransactionsHistory.Count == 0)
+            {
+                Console.WriteLine("Din transaktions historik är tom.");
+                return MenuResult.Continue;
+            }
             foreach (var transaction in account.TransactionsHistory)
             {
                 Console.WriteLine(transaction);
@@ -245,12 +252,6 @@ namespace Bank_App
                     Console.WriteLine($"{pending.Amount}kr till {account.Name}, genomförs kl {pending.TransactionTime:HH:mm:ss}");
                 }
             }
-            else
-            {
-                Console.WriteLine("Din transaktions historik är tom.");
-                return MenuResult.Continue;
-            }
-
             return MenuResult.Continue;
         }
 
