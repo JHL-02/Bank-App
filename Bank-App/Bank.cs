@@ -3,6 +3,7 @@
     internal static class Bank
     {
         public static UserDatabase UserDatabase { get; } = new UserDatabase();
+        public static ExchangeRates ExchangeRates { get; } = new ExchangeRates();
         private static Menu startMenu = new Menu(new List<MenuOption>
         {
             new MenuOption("Logga in.", () =>
