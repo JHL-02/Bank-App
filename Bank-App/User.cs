@@ -196,10 +196,16 @@
         }
         private MenuResult TransactionHistory(BankAccount account)
         {
+            if (account.transactionsHistory.Count == 0)
+            {
+                Console.WriteLine("Din transaktions historik är tom.");
+                return MenuResult.Continue;
+            }
             foreach (var transaction in account.transactionsHistory)
             {
                 Console.WriteLine(transaction);
             }
+            
             return MenuResult.Continue;
         }
 
