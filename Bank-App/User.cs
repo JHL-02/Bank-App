@@ -237,7 +237,20 @@ namespace Bank_App
             {
                 Console.WriteLine(transaction);
             }
-            
+            if (account.PendingTransactionsList.Count > 0)
+            {
+                Console.WriteLine("\n--- Väntande överföringar ---");
+                foreach (var pending in account.PendingTransactionsList)
+                {
+                    Console.WriteLine($"{pending.Amount}kr till {account.Name}, genomförs kl {pending.TransactionTime:HH:mm:ss}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Din transaktions historik är tom.");
+                return MenuResult.Continue;
+            }
+
             return MenuResult.Continue;
         }
 
