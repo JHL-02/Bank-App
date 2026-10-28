@@ -8,13 +8,15 @@
         public const int MaxNameLength = 20;
         public const int MaxAccountAmount = 10;
         // public DateTime TransactionTime { get; set; }
+        public User accountOwner { get; init; }
 
         public List<string> TransactionsHistory = new List<string>();
         public List<(decimal Amount, DateTime TransactionTime)> PendingTransactionsList = new();
 
 
-        public BankAccount(string name)
+        public BankAccount(User owner, string name)
         {
+            accountOwner = owner;
             string newName = name.Trim();
             if (newName.Length > MaxNameLength)
             {

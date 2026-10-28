@@ -8,6 +8,7 @@ namespace Bank_App
         private string Password { get; init; }
         private readonly List<BankAccount> _accounts = new List<BankAccount>();
         public IReadOnlyCollection<BankAccount> Accounts => _accounts.AsReadOnly();
+        public decimal userLoanDebt { get; protected set; }
         public User(string username, string password)
         {
             Username = username;
@@ -22,12 +23,28 @@ namespace Bank_App
             }
             if (isSavingsAccount)
             {
-                _accounts.Add(new SavingsAccount(name));
+                _accounts.Add(new SavingsAccount(this, name));
                 return true;
             }
-            _accounts.Add(new BankAccount(name));
+            _accounts.Add(new BankAccount(this, name));
             return true;
         }
+        public decimal GetTotalBalance() => _accounts.Sum(account => account.GetBalance());
+
+        public void increaseUserLoanDebt(decimal amount)
+        {
+            userLoanDebt += amount;
+        }
+        public void decreaseUserLoanDebt(decimal amount)
+        {
+            decimal newAmount = userLoanDebt - amount;
+            if (newAmount > 0m)
+            {
+
+            }
+                return userLoanDebt += amount;
+        }
+
         public BankAccount? GetAccountWithName(string name)
         {
             return _accounts.Find(a => a.Name == name);

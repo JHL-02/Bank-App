@@ -3,14 +3,13 @@
     internal class SavingsAccount : BankAccount
     {
         // Sparkonto
-        public SavingsAccount(string name) : base(name)
+        public SavingsAccount(User owner, string name) : base(owner, name)
         {
         
         }
 
         // Kapital
         public decimal userSavings { get; protected set; } // Användarens pengar på sparkonto. 
-        public decimal userBalance { get; protected set; } // Användarens pengar på privatkonto. 
         public decimal userLoanDebt { get; private set; } // Användarens skuld hos banken.
 
         // Ränta & Kreditvärdighet
@@ -22,9 +21,9 @@
         // Sparränta
         public void ShowSavingsInterest()
         {
-            if (userSavings > 0)
+            if (Balance > 0)
             {
-                decimal yearlyReturn = userSavings * savingsAccountRate;
+                decimal yearlyReturn = Balance * savingsAccountRate;
                 Console.WriteLine($"Bankens sparränta: {savingsAccountRate:P}. Avkastning per år:{yearlyReturn:C}.");
             }
             else
@@ -37,7 +36,7 @@
 
         public void UserLoan(decimal loanAmount)
         {
-            decimal creditLimit = (userSavings + userBalance) * 5 - userLoanDebt;
+            decimal creditLimit = (accountOwner.GetTotalBalance()) * 5 - userLoanDebt;
             if (creditLimit < 0m)
             {
                 creditLimit = 0m;
