@@ -7,6 +7,8 @@
         public string Name { get; protected set; }
         public const int MaxNameLength = 20;
         public const int MaxAccountAmount = 10;
+        public string AccountType { get; init; }
+
         // public DateTime TransactionTime { get; set; }
         public User accountOwner { get; init; }
 
@@ -16,6 +18,7 @@
 
         public BankAccount(User owner, string name)
         {
+            AccountType = "Privatkonto";
             accountOwner = owner;
             string newName = name.Trim();
             if (newName.Length > MaxNameLength)
@@ -92,7 +95,7 @@
             }
         }
 
-        public string getCurrencyDisplayString()
+        public string getCurrencyDisplayString(decimal number)
         {
             string currencyUnit;
             bool placeUnitBefore = false;
@@ -113,7 +116,7 @@
                     currencyUnit = "";
                     break;
             }
-            decimal convertedBalance = Bank.ExchangeRates.Convert(GetBalance(), Currency.SEK, displayCurrency);
+            decimal convertedBalance = Bank.ExchangeRates.Convert(number, Currency.SEK, displayCurrency);
 
             return placeUnitBefore ? $"{currencyUnit}{convertedBalance}" : $"{convertedBalance}{currencyUnit}";
         }
