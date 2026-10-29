@@ -101,7 +101,7 @@
                             Console.WriteLine("Ange hur mycket räntan ska minskas (t.ex. 0.01 för 1 procentenhet):");
                             decimal reduction = UserInput.GetDecimal();
 
-                            if (reduction > 0)
+                            if (reduction <= 0m)
                             {
                                 Console.WriteLine("Minskningen måste vara mer än 0.");
                                 break;

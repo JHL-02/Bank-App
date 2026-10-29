@@ -7,7 +7,20 @@
         private readonly List<BankAccount> _accounts = new List<BankAccount>();
         public IReadOnlyCollection<BankAccount> Accounts => _accounts.AsReadOnly();
         public decimal userLoanDebt { get; protected set; }
-        public int userCreditScore => Math.Clamp((int)((GetTotalBalance() * 25) / userLoanDebt), 0, 100); // Temporary solution?
+        public int userCreditScore
+        {
+            get
+            {
+                if (userLoanDebt == 0)
+                    return 100;
+
+                return Math.Clamp(
+                    (int)( Math.Round((GetTotalBalance() - userLoanDebt) * 25 / userLoanDebt )),
+                    0,
+                    100
+                );
+            }
+        } // Temporary solution?
         public User(string username, string password)
         {
             Username = username;
@@ -18,7 +31,7 @@
 
         private bool AddAccount(string name, bool isSavingsAccount = false)
         {
-            if (_accounts.Any(a => a.Name == name) || name.Length > BankAccount.MaxNameLength || _accounts.Count >= BankAccount.MaxAccountAmount)
+            if (_accounts.Any(a => string.Equals(a.Name, name, StringComparison.OrdinalIgnoreCase) || name.Length > BankAccount.MaxNameLength || _accounts.Count >= BankAccount.MaxAccountAmount))
             {
                 return false;
             }
@@ -41,7 +54,7 @@
             return Bank.loanCreditRate;
         }
 
-        // LET USER USE THIS IN UI
+        // You always get a year interest for each loan?
         public MenuResult UserLoan()
         {
             Console.WriteLine("Hur mycket pengar vill du långa av banken? (SEK):");
@@ -54,7 +67,8 @@
                 return MenuResult.Continue;
             }
 
-            decimal creditLimit = GetTotalBalance() * 5 - userLoanDebt;
+            decimal ownCapital = GetTotalBalance() - userLoanDebt;
+            decimal creditLimit = ownCapital * 5;
             if (creditLimit < 0m)
             {
                 creditLimit = 0m;
@@ -62,7 +76,7 @@
             decimal yearlyInterest = loanAmount * CalculateCreditRate();
             decimal loanSum = yearlyInterest + loanAmount;
 
-            if (loanAmount > creditLimit || userCreditScore <= 20 || loanAmount <= 0m)
+            if (loanAmount > creditLimit || userCreditScore <= 20)
             {
                 Console.WriteLine("Ditt lån har inte blivit godkänt av banken.");
                 UserInput.WaitForUserConfirm();
@@ -89,10 +103,9 @@
             }
             Console.WriteLine($"Pengarna har överförts till {bankAccount.Name}.");
 
-            userLoanDebt += loanAmount;
+            userLoanDebt += loanSum;
             return MenuResult.Continue;
         }
-        // ADD IN MENU
         public MenuResult PayBackUserLoan()
         {
             if (userLoanDebt <= 0m)
@@ -131,15 +144,13 @@
                 return MenuResult.Continue;
             }
 
-            if (newAmount < 0m)
+            if (!payingAccount.Withdraw(userPays))
             {
-                userLoanDebt = 0m;
+                Console.WriteLine("FEL: Det gick inte att ta pengar ur kontot.");
+                return MenuResult.Continue;
             }
-            else
-            {
-                userLoanDebt = newAmount;
-            }
-            payingAccount.Withdraw(userPays);
+
+            userLoanDebt -= userPays;
 
             Console.WriteLine($"Du har betalat tillbaka {payingAccount.getCurrencyDisplayString(userPays)} till banken.");
             UserInput.WaitForUserConfirm();
@@ -148,7 +159,7 @@
 
         public BankAccount? GetAccountWithName(string name)
         {
-            return _accounts.Find(a => a.Name == name);
+            return _accounts.Find(a => string.Equals(a.Name, name, StringComparison.OrdinalIgnoreCase));
         }
 
         private MenuResult UserCreateAccount()
@@ -157,6 +168,7 @@
             {
                 Console.WriteLine($"Du kan inte skapa mer än {BankAccount.MaxAccountAmount} konton.");
                 UserInput.WaitForUserConfirm();
+                return MenuResult.Continue;
             }
             Console.WriteLine("1. Bankkonto\n2. Sparkonto");
             int accountTypeInput;
@@ -179,7 +191,15 @@
             while (true)
             {
                 input = UserInput.GetString("Du behöver skriva in ett giltigt kontonamn.");
+
+                if (input.Any(char.IsWhiteSpace))
+                {
+                    Console.WriteLine("Kontonamnet får inte innehålla mellanslag.");
+                    continue;
+                }
+
                 proposedName = input.Trim();
+
 
                 if (proposedName.Length <= BankAccount.MaxNameLength)
                 {

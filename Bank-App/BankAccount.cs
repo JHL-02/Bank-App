@@ -46,18 +46,32 @@
             }
         }
 
-        public void Withdraw(decimal amount)
+        public bool Withdraw(decimal amount)
         {
             ExecuteTransactions();
 
-            if (amount > 0)
-            {
-                Balance -= amount;
-            }
+            if (amount <= 0m || amount > Balance)
+                return false;
+
+            Balance -= amount;
+            return true;
         }
         public bool Transactions(BankAccount targetedAccount, decimal transferAmount)
         {
+            if (targetedAccount == this)
+            {
+                Console.WriteLine("Du kan inte överföra till samma konto.");
+                return false;
+            }
+
+            if (transferAmount <= 0)
+            {
+                Console.WriteLine("Du kan inte överföra 0 eller mindre pengar.");
+                return false;
+            }
+
             ExecuteTransactions();
+
             if (transferAmount > Balance || Balance <= 0)
             {
                 Console.WriteLine("För litet saldo");
@@ -76,6 +90,9 @@
 
         public void AddPendingTransaction(decimal transferAmount, DateTime transferedTime)
         {
+            if (transferAmount <= 0m)
+                throw new ArgumentOutOfRangeException(nameof(transferAmount));
+
             PendingTransactionsList.Add((transferAmount, transferedTime));
         }
 
