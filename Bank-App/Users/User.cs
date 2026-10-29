@@ -57,7 +57,7 @@
         // You always get a year interest for each loan?
         public MenuResult UserLoan()
         {
-            Console.WriteLine("Hur mycket pengar vill du långa av banken? (SEK):");
+            Console.WriteLine("Hur mycket pengar vill du låna av banken? (SEK):");
             decimal loanAmount = UserInput.GetDecimal("Du behöver skriva in en siffra.");
 
             if (loanAmount <= 0m)
@@ -277,6 +277,7 @@
             Console.WriteLine($"Telefon: N/A");
             Console.WriteLine($"Du är skyldig att betala tillbaka {userLoanDebt}kr till banken.");
             Console.WriteLine($"Din kreditvärdighet är {userCreditScore}");
+            UserInput.WaitForUserConfirm();
             return MenuResult.Continue;
         }
 

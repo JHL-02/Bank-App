@@ -133,7 +133,7 @@
                     currencyUnit = "";
                     break;
             }
-            decimal convertedBalance = Bank.ExchangeRates.Convert(number, Currency.SEK, displayCurrency);
+            string convertedBalance = Bank.ExchangeRates.Convert(number, Currency.SEK, displayCurrency).ToString("C2");
 
             return placeUnitBefore ? $"{currencyUnit}{convertedBalance}" : $"{convertedBalance}{currencyUnit}";
         }
