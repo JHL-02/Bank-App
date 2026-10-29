@@ -11,7 +11,12 @@
             Menu adminMenu = new Menu(new List<MenuOption>
             {
                 new MenuOption("Lägg till ny användare i systemet", () => AddUser()),
-                new MenuOption("Ge pengar till användare", () => AddBalance())
+                new MenuOption("Ge pengar till användare", () => AddBalance()),
+                new MenuOption("Justera kreditränta.", () =>
+                {
+                    Bank.AdjustCreditRate();
+                    return MenuResult.Continue;
+                })
             }, "Admin panelen");
             adminMenu.Display();
             return MenuResult.Continue;

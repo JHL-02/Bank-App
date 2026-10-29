@@ -7,14 +7,19 @@
         public string Name { get; protected set; }
         public const int MaxNameLength = 20;
         public const int MaxAccountAmount = 10;
+        public string AccountType { get; init; }
+
         // public DateTime TransactionTime { get; set; }
+        public User accountOwner { get; init; }
 
         public List<string> TransactionsHistory = new List<string>();
         public List<(decimal Amount, DateTime TransactionTime)> PendingTransactionsList = new();
 
 
-        public BankAccount(string name)
+        public BankAccount(User owner, string name)
         {
+            AccountType = "Privatkonto";
+            accountOwner = owner;
             string newName = name.Trim();
             if (newName.Length > MaxNameLength)
             {
@@ -41,18 +46,32 @@
             }
         }
 
-        public void Withdraw(decimal amount)
+        public bool Withdraw(decimal amount)
         {
             ExecuteTransactions();
 
-            if (amount > 0)
-            {
-                Balance -= amount;
-            }
+            if (amount <= 0m || amount > Balance)
+                return false;
+
+            Balance -= amount;
+            return true;
         }
         public bool Transactions(BankAccount targetedAccount, decimal transferAmount)
         {
+            if (targetedAccount == this)
+            {
+                Console.WriteLine("Du kan inte överföra till samma konto.");
+                return false;
+            }
+
+            if (transferAmount <= 0)
+            {
+                Console.WriteLine("Du kan inte överföra 0 eller mindre pengar.");
+                return false;
+            }
+
             ExecuteTransactions();
+
             if (transferAmount > Balance || Balance <= 0)
             {
                 Console.WriteLine("För litet saldo");
@@ -71,6 +90,9 @@
 
         public void AddPendingTransaction(decimal transferAmount, DateTime transferedTime)
         {
+            if (transferAmount <= 0m)
+                throw new ArgumentOutOfRangeException(nameof(transferAmount));
+
             PendingTransactionsList.Add((transferAmount, transferedTime));
         }
 
@@ -90,7 +112,7 @@
             }
         }
 
-        public string getCurrencyDisplayString()
+        public string getCurrencyDisplayString(decimal number)
         {
             string currencyUnit;
             bool placeUnitBefore = false;
@@ -111,7 +133,7 @@
                     currencyUnit = "";
                     break;
             }
-            decimal convertedBalance = Bank.ExchangeRates.Convert(GetBalance(), Currency.SEK, displayCurrency);
+            string convertedBalance = Bank.ExchangeRates.Convert(number, Currency.SEK, displayCurrency).ToString("C2");
 
             return placeUnitBefore ? $"{currencyUnit}{convertedBalance}" : $"{convertedBalance}{currencyUnit}";
         }
