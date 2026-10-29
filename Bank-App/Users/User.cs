@@ -125,6 +125,7 @@
                 return MenuResult.Continue;
             }
 
+            Console.WriteLine($"Pengar skyldig till banken: {payingAccount.getCurrencyDisplayString(userLoanDebt)}");
             Console.WriteLine($"Hur mycket vill du betala tillbaka? ({payingAccount.displayCurrency.ToString()}):");
             decimal amount = Bank.ExchangeRates.Convert(UserInput.GetDecimal("Du behöver skriva in en siffra."), payingAccount.displayCurrency, Currency.SEK);
 
