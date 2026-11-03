@@ -47,11 +47,25 @@
 
         public static void StartProgram()
         {
+            _ = TimerService.TransactionsTimer(ExecuteAllTransactions);
+
             UserDatabase.AddUser("User0", "1234", true);
             UserDatabase.AddUser("User1", "1234");
             UserDatabase.AddUser("User2", "1234");
 
             startMenu.Display();
+        }
+
+        private static void ExecuteAllTransactions()
+        {
+            foreach (User user in UserDatabase.Users)
+            {
+                foreach (BankAccount bankAccount in user.Accounts)
+                {
+                    bankAccount.ExecuteTransactions();
+                }
+            }
+
         }
 
         public static decimal AdjustCreditRate()

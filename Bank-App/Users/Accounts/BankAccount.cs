@@ -1,4 +1,7 @@
-﻿namespace Bank_App
+﻿using System.Data.Common;
+using System.Transactions;
+
+namespace Bank_App
 {
     internal class BankAccount
     {
@@ -11,9 +14,8 @@
 
         // public DateTime TransactionTime { get; set; }
         public User accountOwner { get; init; }
-
         public List<string> TransactionsHistory = new List<string>();
-        public List<(decimal Amount, DateTime TransactionTime)> PendingTransactionsList = new();
+        public Stack<(string AccountName, decimal Amount, DateTime TransactionTime)> PendingTransactionsList = new();
 
 
         public BankAccount(User owner, string name)
@@ -32,14 +34,11 @@
 
         public decimal GetBalance()
         {
-            ExecuteTransactions();
             return Balance;
         }
 
         public void Deposit(decimal amount)
         {
-            ExecuteTransactions();
-
             if (amount > 0)
             {
                 Balance += amount;
@@ -48,7 +47,6 @@
 
         public bool Withdraw(decimal amount)
         {
-            ExecuteTransactions();
 
             if (amount <= 0m || amount > Balance)
                 return false;
@@ -70,8 +68,6 @@
                 return false;
             }
 
-            ExecuteTransactions();
-
             if (transferAmount > Balance || Balance <= 0)
             {
                 Console.WriteLine("För litet saldo");
@@ -79,21 +75,21 @@
             }
             else
             {
-                DateTime realTime = DateTime.Now;
-                DateTime transferedTime = realTime.AddMinutes(1);
+                
+                DateTime transferedTime = DateTime.Now.AddMinutes(15);
                 Balance -= transferAmount;
-                targetedAccount.AddPendingTransaction(transferAmount, transferedTime);
-                TransactionsHistory.Add($"Ditt konto {Name} skickade {transferAmount} till {targetedAccount.Name} {transferedTime}");
+                targetedAccount.AddPendingTransaction(Name,transferAmount, transferedTime);
+                TransactionsHistory.Add($"{Name} kommer att skicka: {transferAmount}kr till {targetedAccount.Name} {transferedTime}");
                 return true;
             }
         }
 
-        public void AddPendingTransaction(decimal transferAmount, DateTime transferedTime)
+        public void AddPendingTransaction(string AccountName,decimal transferAmount, DateTime transferedTime)
         {
             if (transferAmount <= 0m)
                 throw new ArgumentOutOfRangeException(nameof(transferAmount));
 
-            PendingTransactionsList.Add((transferAmount, transferedTime));
+            PendingTransactionsList.Push((AccountName, transferAmount, transferedTime));
         }
 
         public void setDisplayCurrency(Currency newCurrency)
@@ -103,13 +99,19 @@
 
         public void ExecuteTransactions()
         {
-            var transactions = PendingTransactionsList.Where(t => t.TransactionTime <= DateTime.Now).ToList();
-            foreach (var transaction in transactions)
+            if (PendingTransactionsList.Count < 1)
             {
-                Balance += transaction.Amount;
-                PendingTransactionsList.Remove(transaction);
-                TransactionsHistory.Add($"??? skickade {transaction.Amount} till dig {DateTime.Now}");
+                return;
             }
+
+            while (PendingTransactionsList.Count > 0)
+            {
+                var transaction = PendingTransactionsList.Pop();
+
+                Deposit(transaction.Amount);
+                TransactionsHistory.Add($"{transaction.AccountName} skickade {transaction.Amount}kr till dig {DateTime.Now}");
+            }
+            //accountOwner.MarkTransactionsUpdated();
         }
 
         public string getCurrencyDisplayString(decimal number)

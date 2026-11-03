@@ -1,4 +1,6 @@
-﻿namespace Bank_App
+﻿using System.Reflection.Metadata.Ecma335;
+
+namespace Bank_App
 {
     internal class User
     {
@@ -15,12 +17,13 @@
                     return 100;
 
                 return Math.Clamp(
-                    (int)( Math.Round((GetTotalBalance() - userLoanDebt) * 25 / userLoanDebt )),
+                    (int)(Math.Round((GetTotalBalance() - userLoanDebt) * 25 / userLoanDebt)),
                     0,
                     100
                 );
             }
         } // Temporary solution?
+
         public User(string username, string password)
         {
             Username = username;
@@ -231,42 +234,52 @@
 
         public MenuResult DisplayAccountMenu()
         {
-            MenuResult menuResult;
+            TimerService.OnTimerTick += NotifyUser;
 
-            if (this is Admin admin)
+            try
             {
-                Console.WriteLine("Vill du logga in som admin?");
-                if (UserInput.GetYesOrNo())
+                MenuResult menuResult;
+
+                if (this is Admin admin)
                 {
-                    Console.WriteLine("Loggar in som admin.");
-                    admin.DisplayAdminMenu();
-                    return MenuResult.Continue;
+                    Console.WriteLine("Vill du logga in som admin?");
+                    if (UserInput.GetYesOrNo())
+                    {
+                        Console.WriteLine("Loggar in som admin.");
+                        admin.DisplayAdminMenu();
+                        return MenuResult.Continue;
+                    }
+
+                    Console.WriteLine("Loggar in som användare.");
                 }
 
-                Console.WriteLine("Loggar in som användare.");
+                do
+                {
+                    List<MenuOption> menuOptions = new List<MenuOption>();
+
+                    menuOptions.Add(new MenuOption("Lägg till nytt konto.", () => UserCreateAccount()));
+
+                    menuOptions.Add(new MenuOption("Visa användaruppgifter.", () => DisplayUserInfo()));
+
+                    menuOptions.Add(new MenuOption("Låna pengar av banken.", UserLoan));
+                    menuOptions.Add(new MenuOption("Betala pengar tillbaka till banken.", PayBackUserLoan));
+
+                    foreach (BankAccount account in _accounts)
+                    {
+                        menuOptions.Add(new MenuOption($"Konto: {account.Name}", () => DisplayAccountMenu(account)));
+                    }
+
+                    Menu accountMenu = new Menu(menuOptions, $"Kontohantering - {Username}");
+                    menuResult = accountMenu.Display();
+                } while (menuResult == MenuResult.Rebuild);
+
+
+                return MenuResult.Continue;
             }
-
-            do
+            finally
             {
-                List<MenuOption> menuOptions = new List<MenuOption>();
-
-                menuOptions.Add(new MenuOption("Lägg till nytt konto.", () => UserCreateAccount()));
-
-                menuOptions.Add(new MenuOption("Visa användaruppgifter.", () => DisplayUserInfo()));
-
-                menuOptions.Add(new MenuOption("Låna pengar av banken.", UserLoan));
-                menuOptions.Add(new MenuOption("Betala pengar tillbaka till banken.", PayBackUserLoan));
-
-                foreach (BankAccount account in _accounts)
-                {
-                    menuOptions.Add(new MenuOption($"Konto: {account.Name}", () => DisplayAccountMenu(account)));
-                }
-
-                Menu accountMenu = new Menu(menuOptions, $"Kontohantering - {Username}");
-                menuResult = accountMenu.Display();
-            } while (menuResult == MenuResult.Rebuild);
-
-            return MenuResult.Continue;
+                TimerService.OnTimerTick -= NotifyUser;
+            }
         }
 
         private MenuResult DisplayUserInfo()
@@ -287,17 +300,17 @@
             {
                 new MenuOption("Visa info.", () =>
                 {
-                    Console.WriteLine("------");
-                    Console.WriteLine($"Kontonamn: {account.Name}");
-                    Console.WriteLine($"Kontotyp: {account.AccountType}");
-                    Console.WriteLine($"Valuta: {account.displayCurrency.ToString()}");
-                    Console.WriteLine($"Saldo: {account.getCurrencyDisplayString(account.GetBalance())}");
-                    if (account is SavingsAccount savingsAccount)
-                    {
-                        savingsAccount.ShowSavingsInterest();
-                    }
-                    UserInput.WaitForUserConfirm();
-                    return MenuResult.Continue;
+                     Console.WriteLine("------");
+                     Console.WriteLine($"Kontonamn: {account.Name}");
+                     Console.WriteLine($"Kontotyp: {account.AccountType}");
+                     Console.WriteLine($"Valuta: {account.displayCurrency.ToString()}");
+                     Console.WriteLine($"Saldo: {account.getCurrencyDisplayString(account.GetBalance())}");
+                     if (account is SavingsAccount savingsAccount)
+                     {
+                         savingsAccount.ShowSavingsInterest();
+                     }
+                     UserInput.WaitForUserConfirm();
+                     return MenuResult.Continue;
                 }),
                 new MenuOption("Överföra pengar", () => StartUserTransaction(account)),
                 new MenuOption("Transaktions historik", () => TransactionHistory(account)),
@@ -394,8 +407,6 @@
         }
         private MenuResult TransactionHistory(BankAccount account)
         {
-            account.ExecuteTransactions();
-
             if (account.TransactionsHistory.Count == 0)
             {
                 Console.WriteLine("Din transaktions historik är tom.");
@@ -417,5 +428,15 @@
         }
 
         public BankAccount? UserSelectAccount() => UserInput.UserGetObjectFromList<BankAccount>(_accounts, a => a.Name);
+
+        //private int _updatedTransactions = 0;
+        //public void MarkTransactionsUpdated()
+        //{
+        //    Interlocked.Exchange(ref _updatedTransactions, 1);
+        //}
+        private void NotifyUser()
+        {
+            _ = TimerService.ShowNotification($"Transaktioner uppdaterades.");
+        }
     }
 }
