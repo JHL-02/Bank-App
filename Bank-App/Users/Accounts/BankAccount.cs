@@ -15,7 +15,7 @@ namespace Bank_App
         // public DateTime TransactionTime { get; set; }
         public User accountOwner { get; init; }
         public List<string> TransactionsHistory = new List<string>();
-        public Stack<(decimal Amount, DateTime TransactionTime)> PendingTransactionsList = new();
+        public Stack<(string AccountName, decimal Amount, DateTime TransactionTime)> PendingTransactionsList = new();
 
 
         public BankAccount(User owner, string name)
@@ -75,21 +75,21 @@ namespace Bank_App
             }
             else
             {
-                DateTime realTime = DateTime.Now;
-                DateTime transferedTime = realTime.AddMinutes(1);
+                
+                DateTime transferedTime = DateTime.Now.AddMinutes(15);
                 Balance -= transferAmount;
-                targetedAccount.AddPendingTransaction(transferAmount, transferedTime);
-                TransactionsHistory.Add($"Ditt konto {Name} skickade {transferAmount}kr till {targetedAccount.Name} {transferedTime}");
+                targetedAccount.AddPendingTransaction(Name,transferAmount, transferedTime);
+                TransactionsHistory.Add($"{Name} kommer att skicka: {transferAmount}kr till {targetedAccount.Name} {transferedTime}");
                 return true;
             }
         }
 
-        public void AddPendingTransaction(decimal transferAmount, DateTime transferedTime)
+        public void AddPendingTransaction(string AccountName,decimal transferAmount, DateTime transferedTime)
         {
             if (transferAmount <= 0m)
                 throw new ArgumentOutOfRangeException(nameof(transferAmount));
 
-            PendingTransactionsList.Push((transferAmount, transferedTime));
+            PendingTransactionsList.Push((AccountName, transferAmount, transferedTime));
         }
 
         public void setDisplayCurrency(Currency newCurrency)
@@ -109,7 +109,7 @@ namespace Bank_App
                 var transaction = PendingTransactionsList.Pop();
 
                 Deposit(transaction.Amount);
-                TransactionsHistory.Add($"??? skickade {transaction.Amount}kr till dig {DateTime.Now}");
+                TransactionsHistory.Add($"{transaction.AccountName} skickade {transaction.Amount}kr till dig {DateTime.Now}");
             }
             //accountOwner.MarkTransactionsUpdated();
         }
