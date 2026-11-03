@@ -23,6 +23,7 @@ namespace Bank_App
                 );
             }
         } // Temporary solution?
+
         public User(string username, string password)
         {
             Username = username;
@@ -233,42 +234,52 @@ namespace Bank_App
 
         public MenuResult DisplayAccountMenu()
         {
-            MenuResult menuResult;
+            TimerService.OnTimerTick += NotifyUser;
 
-            if (this is Admin admin)
+            try
             {
-                Console.WriteLine("Vill du logga in som admin?");
-                if (UserInput.GetYesOrNo())
+                MenuResult menuResult;
+
+                if (this is Admin admin)
                 {
-                    Console.WriteLine("Loggar in som admin.");
-                    admin.DisplayAdminMenu();
-                    return MenuResult.Continue;
+                    Console.WriteLine("Vill du logga in som admin?");
+                    if (UserInput.GetYesOrNo())
+                    {
+                        Console.WriteLine("Loggar in som admin.");
+                        admin.DisplayAdminMenu();
+                        return MenuResult.Continue;
+                    }
+
+                    Console.WriteLine("Loggar in som användare.");
                 }
 
-                Console.WriteLine("Loggar in som användare.");
+                do
+                {
+                    List<MenuOption> menuOptions = new List<MenuOption>();
+
+                    menuOptions.Add(new MenuOption("Lägg till nytt konto.", () => UserCreateAccount()));
+
+                    menuOptions.Add(new MenuOption("Visa användaruppgifter.", () => DisplayUserInfo()));
+
+                    menuOptions.Add(new MenuOption("Låna pengar av banken.", UserLoan));
+                    menuOptions.Add(new MenuOption("Betala pengar tillbaka till banken.", PayBackUserLoan));
+
+                    foreach (BankAccount account in _accounts)
+                    {
+                        menuOptions.Add(new MenuOption($"Konto: {account.Name}", () => DisplayAccountMenu(account)));
+                    }
+
+                    Menu accountMenu = new Menu(menuOptions, $"Kontohantering - {Username}");
+                    menuResult = accountMenu.Display();
+                } while (menuResult == MenuResult.Rebuild);
+
+
+                return MenuResult.Continue;
             }
-
-            do
+            finally
             {
-                List<MenuOption> menuOptions = new List<MenuOption>();
-
-                menuOptions.Add(new MenuOption("Lägg till nytt konto.", () => UserCreateAccount()));
-
-                menuOptions.Add(new MenuOption("Visa användaruppgifter.", () => DisplayUserInfo()));
-
-                menuOptions.Add(new MenuOption("Låna pengar av banken.", UserLoan));
-                menuOptions.Add(new MenuOption("Betala pengar tillbaka till banken.", PayBackUserLoan));
-
-                foreach (BankAccount account in _accounts)
-                {
-                    menuOptions.Add(new MenuOption($"Konto: {account.Name}", () => DisplayAccountMenu(account)));
-                }
-
-                Menu accountMenu = new Menu(menuOptions, $"Kontohantering - {Username}");
-                menuResult = accountMenu.Display();
-            } while (menuResult == MenuResult.Rebuild);
-
-            return MenuResult.Continue;
+                TimerService.OnTimerTick -= NotifyUser;
+            }
         }
 
         private MenuResult DisplayUserInfo()
@@ -417,5 +428,15 @@ namespace Bank_App
         }
 
         public BankAccount? UserSelectAccount() => UserInput.UserGetObjectFromList<BankAccount>(_accounts, a => a.Name);
+
+        //private int _updatedTransactions = 0;
+        //public void MarkTransactionsUpdated()
+        //{
+        //    Interlocked.Exchange(ref _updatedTransactions, 1);
+        //}
+        private void NotifyUser()
+        {
+            _ = TimerService.ShowNotification($"Transaktioner uppdaterades.");
+        }
     }
 }

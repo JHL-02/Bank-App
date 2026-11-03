@@ -1,4 +1,7 @@
-﻿namespace Bank_App
+﻿using System.Data.Common;
+using System.Transactions;
+
+namespace Bank_App
 {
     internal class BankAccount
     {
@@ -12,7 +15,7 @@
         // public DateTime TransactionTime { get; set; }
         public User accountOwner { get; init; }
         public List<string> TransactionsHistory = new List<string>();
-        public List<(decimal Amount, DateTime TransactionTime)> PendingTransactionsList = new();
+        public Stack<(decimal Amount, DateTime TransactionTime)> PendingTransactionsList = new();
 
 
         public BankAccount(User owner, string name)
@@ -86,7 +89,7 @@
             if (transferAmount <= 0m)
                 throw new ArgumentOutOfRangeException(nameof(transferAmount));
 
-            PendingTransactionsList.Add((transferAmount, transferedTime));
+            PendingTransactionsList.Push((transferAmount, transferedTime));
         }
 
         public void setDisplayCurrency(Currency newCurrency)
@@ -96,12 +99,19 @@
 
         public void ExecuteTransactions()
         {
-            foreach (var transaction in PendingTransactionsList)
+            if (PendingTransactionsList.Count < 1)
             {
-                Balance += transaction.Amount;
-                PendingTransactionsList.Remove(transaction);
+                return;
+            }
+
+            while (PendingTransactionsList.Count > 0)
+            {
+                var transaction = PendingTransactionsList.Pop();
+
+                Deposit(transaction.Amount);
                 TransactionsHistory.Add($"??? skickade {transaction.Amount}kr till dig {DateTime.Now}");
             }
+            //accountOwner.MarkTransactionsUpdated();
         }
 
         public string getCurrencyDisplayString(decimal number)
