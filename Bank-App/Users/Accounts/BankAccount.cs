@@ -83,7 +83,7 @@
                 DateTime transferedTime = realTime.AddMinutes(1);
                 Balance -= transferAmount;
                 targetedAccount.AddPendingTransaction(transferAmount, transferedTime);
-                TransactionsHistory.Add($"Ditt konto {Name} skickade {transferAmount}kr till {targetedAccount.Name} {transferedTime}");
+                TransactionsHistory.Add($"Ditt konto {Name} skickade {transferAmount} till {targetedAccount.Name} {transferedTime}");
                 return true;
             }
         }
@@ -108,7 +108,7 @@
             {
                 Balance += transaction.Amount;
                 PendingTransactionsList.Remove(transaction);
-                TransactionsHistory.Add($"??? skickade {transaction.Amount}kr till dig {DateTime.Now}");
+                TransactionsHistory.Add($"??? skickade {transaction.Amount} till dig {DateTime.Now}");
             }
         }
 
@@ -133,7 +133,7 @@
                     currencyUnit = "";
                     break;
             }
-            string convertedBalance = Bank.ExchangeRates.Convert(number, Currency.SEK, displayCurrency).ToString("C2");
+            string convertedBalance = Bank.ExchangeRates.Convert(number, Currency.SEK, displayCurrency).ToString("F2");
 
             return placeUnitBefore ? $"{currencyUnit}{convertedBalance}" : $"{convertedBalance}{currencyUnit}";
         }
