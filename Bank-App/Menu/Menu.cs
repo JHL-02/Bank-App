@@ -32,7 +32,7 @@
                     Console.WriteLine($"| {i + 1}. {Options[i].Title,-21} |");
                 }
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"| {Options.Count + 1}. {LeaveMenuString,-21} |");
+                Console.WriteLine($"| 0. {LeaveMenuString,-21} |");
                 Console.ForegroundColor = defaultColor;
                 Console.WriteLine("+--------------------------+");
                 Console.ResetColor();
@@ -43,7 +43,7 @@
                 {
                     userPick = UserInput.GetInt();
 
-                    if (userPick >= 1 && userPick <= Options.Count + 1)
+                    if (userPick >= 0 && userPick <= Options.Count)
                     {
                         break;
                     }
@@ -51,7 +51,7 @@
                     Console.WriteLine("Du behöver välja ett alternativ.");
                 }
 
-                if (userPick == Options.Count + 1)
+                if (userPick == 0)
                 {
                     return MenuResult.Exit;
                 }
