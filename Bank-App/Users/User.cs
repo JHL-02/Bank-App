@@ -288,7 +288,7 @@ namespace Bank_App
             Console.WriteLine($"Namn: N/A");
             Console.WriteLine($"Email: N/A");
             Console.WriteLine($"Telefon: N/A");
-            Console.WriteLine($"Du är skyldig att betala tillbaka {userLoanDebt}kr till banken.");
+            Console.WriteLine($"Du är skyldig att betala tillbaka {userLoanDebt} till banken.");
             Console.WriteLine($"Din kreditvärdighet är {userCreditScore}");
             UserInput.WaitForUserConfirm();
             return MenuResult.Continue;

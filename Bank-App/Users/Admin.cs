@@ -16,9 +16,42 @@
                 {
                     Bank.AdjustCreditRate();
                     return MenuResult.Continue;
-                })
+                }),
+                new MenuOption("Uppdatera växelkurs", () => UpdateExchangeRate()),
+                new MenuOption("Visa växelkurser", () =>
+                {
+                    Bank.ExchangeRates.ShowRate();
+                    UserInput.WaitForUserConfirm();
+                    return MenuResult.Continue;
+                } )
+
             }, "Admin panelen");
             adminMenu.Display();
+            return MenuResult.Continue;
+        }
+
+        // Admin skriver in dagens kurs. SEK är basen (alltid 1) och kan inte ändras.
+        private MenuResult UpdateExchangeRate()
+        {
+            Bank.ExchangeRates.ShowRate();
+            Console.WriteLine("Vilken valuta vill du uppdatera?");
+            List<Currency> currencies = Enum.GetValues<Currency>().Where(c => c != Currency.SEK).ToList();
+            Currency? chosenCurrency = UserInput.UserGetObjectFromList(currencies, c => c.ToString());
+            if (chosenCurrency == null)
+            {
+                return MenuResult.Continue;
+            }
+            Console.WriteLine($"Ange ny kurs: hur många SEK är 1 {chosenCurrency}?");
+            decimal newRate = UserInput.GetDecimal();
+            if (Bank.ExchangeRates.UpdateRate(chosenCurrency.Value, newRate))
+            {
+                Console.WriteLine($"Kursen för {chosenCurrency} har uppdaterats.");
+            }
+            else
+            {
+                Console.WriteLine("Kursen kunde inte uppdateras. Den måste vara större än 0.");
+            }
+            UserInput.WaitForUserConfirm();
             return MenuResult.Continue;
         }
 
