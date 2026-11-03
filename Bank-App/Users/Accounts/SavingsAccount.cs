@@ -12,7 +12,6 @@
         // Sparränta
         public void ShowSavingsInterest()
         {
-            ExecuteTransactions();
             if (Balance > 0)
             {
                 decimal yearlyReturn = Balance * savingsAccountRate;

@@ -1,4 +1,6 @@
-﻿namespace Bank_App
+﻿using System.Reflection.Metadata.Ecma335;
+
+namespace Bank_App
 {
     internal class User
     {
@@ -15,7 +17,7 @@
                     return 100;
 
                 return Math.Clamp(
-                    (int)( Math.Round((GetTotalBalance() - userLoanDebt) * 25 / userLoanDebt )),
+                    (int)(Math.Round((GetTotalBalance() - userLoanDebt) * 25 / userLoanDebt)),
                     0,
                     100
                 );
@@ -287,17 +289,17 @@
             {
                 new MenuOption("Visa info.", () =>
                 {
-                    Console.WriteLine("------");
-                    Console.WriteLine($"Kontonamn: {account.Name}");
-                    Console.WriteLine($"Kontotyp: {account.AccountType}");
-                    Console.WriteLine($"Valuta: {account.displayCurrency.ToString()}");
-                    Console.WriteLine($"Saldo: {account.getCurrencyDisplayString(account.GetBalance())}");
-                    if (account is SavingsAccount savingsAccount)
-                    {
-                        savingsAccount.ShowSavingsInterest();
-                    }
-                    UserInput.WaitForUserConfirm();
-                    return MenuResult.Continue;
+                     Console.WriteLine("------");
+                     Console.WriteLine($"Kontonamn: {account.Name}");
+                     Console.WriteLine($"Kontotyp: {account.AccountType}");
+                     Console.WriteLine($"Valuta: {account.displayCurrency.ToString()}");
+                     Console.WriteLine($"Saldo: {account.getCurrencyDisplayString(account.GetBalance())}");
+                     if (account is SavingsAccount savingsAccount)
+                     {
+                         savingsAccount.ShowSavingsInterest();
+                     }
+                     UserInput.WaitForUserConfirm();
+                     return MenuResult.Continue;
                 }),
                 new MenuOption("Överföra pengar", () => StartUserTransaction(account)),
                 new MenuOption("Transaktions historik", () => TransactionHistory(account)),
@@ -394,8 +396,6 @@
         }
         private MenuResult TransactionHistory(BankAccount account)
         {
-            account.ExecuteTransactions();
-
             if (account.TransactionsHistory.Count == 0)
             {
                 Console.WriteLine("Din transaktions historik är tom.");

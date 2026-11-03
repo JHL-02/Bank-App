@@ -11,7 +11,6 @@
 
         // public DateTime TransactionTime { get; set; }
         public User accountOwner { get; init; }
-
         public List<string> TransactionsHistory = new List<string>();
         public List<(decimal Amount, DateTime TransactionTime)> PendingTransactionsList = new();
 
@@ -32,14 +31,11 @@
 
         public decimal GetBalance()
         {
-            ExecuteTransactions();
             return Balance;
         }
 
         public void Deposit(decimal amount)
         {
-            ExecuteTransactions();
-
             if (amount > 0)
             {
                 Balance += amount;
@@ -48,7 +44,6 @@
 
         public bool Withdraw(decimal amount)
         {
-            ExecuteTransactions();
 
             if (amount <= 0m || amount > Balance)
                 return false;
@@ -69,8 +64,6 @@
                 Console.WriteLine("Du kan inte överföra 0 eller mindre pengar.");
                 return false;
             }
-
-            ExecuteTransactions();
 
             if (transferAmount > Balance || Balance <= 0)
             {
@@ -103,8 +96,7 @@
 
         public void ExecuteTransactions()
         {
-            var transactions = PendingTransactionsList.Where(t => t.TransactionTime <= DateTime.Now).ToList();
-            foreach (var transaction in transactions)
+            foreach (var transaction in PendingTransactionsList)
             {
                 Balance += transaction.Amount;
                 PendingTransactionsList.Remove(transaction);
@@ -133,7 +125,7 @@
                     currencyUnit = "";
                     break;
             }
-            string convertedBalance = Bank.ExchangeRates.Convert(number, Currency.SEK, displayCurrency).ToString("C2");
+            string convertedBalance = Bank.ExchangeRates.Convert(number, Currency.SEK, displayCurrency).ToString("F2");
 
             return placeUnitBefore ? $"{currencyUnit}{convertedBalance}" : $"{convertedBalance}{currencyUnit}";
         }
