@@ -15,7 +15,7 @@ namespace Bank_App
         // public DateTime TransactionTime { get; set; }
         public User accountOwner { get; init; }
         public List<string> TransactionsHistory = new List<string>();
-        public Stack<(string AccountName, decimal Amount, DateTime TransactionTime)> PendingTransactionsList = new();
+        public Stack<(string AccountName, decimal Amount, DateTime TransactionTime, bool IsSender)> PendingTransactionsList = new();
 
 
         public BankAccount(User owner, string name)
@@ -77,21 +77,23 @@ namespace Bank_App
             {
                 
                 DateTime transferedTime = DateTime.Now.AddMinutes(15);
-                Balance -= transferAmount;
-                targetedAccount.AddPendingTransaction(Name,transferAmount, transferedTime);
-                TransactionsHistory.Add($"{Name} kommer att skicka: {transferAmount}kr till {targetedAccount.Name} {transferedTime}");
+                Withdraw(transferAmount);
+                targetedAccount.AddPendingTransaction(Name,transferAmount, transferedTime, false);
+                AddPendingTransaction(targetedAccount.Name, transferAmount, transferedTime, true);
+                
                 return true;
             }
         }
 
-        public void AddPendingTransaction(string AccountName,decimal transferAmount, DateTime transferedTime)
+        public void AddPendingTransaction(string accountName,decimal transferAmount, DateTime transferedTime, bool isSender)
         {
             if (transferAmount <= 0m)
                 throw new ArgumentOutOfRangeException(nameof(transferAmount));
 
-            PendingTransactionsList.Push((AccountName, transferAmount, transferedTime));
+            PendingTransactionsList.Push((accountName, transferAmount, transferedTime, isSender));
         }
 
+       
         public void setDisplayCurrency(Currency newCurrency)
         {
             displayCurrency = newCurrency;
@@ -109,7 +111,9 @@ namespace Bank_App
                 var transaction = PendingTransactionsList.Pop();
 
                 Deposit(transaction.Amount);
+                
                 TransactionsHistory.Add($"{transaction.AccountName} skickade {transaction.Amount}kr till dig {DateTime.Now}");
+                
             }
             //accountOwner.MarkTransactionsUpdated();
         }
