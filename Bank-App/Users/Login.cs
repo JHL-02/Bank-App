@@ -31,7 +31,7 @@
                 user = _database.GetUserWithUsername(username);
                 if (user == null)
                 {
-                    Console.WriteLine($"Användare hittades inte. Försök kvar: {2 - usernameAttempts}");
+                    Message.WriteLine(new Message($"Användare hittades inte. Försök kvar: {2 - usernameAttempts}"));
                     continue;
                 }
 
@@ -39,7 +39,7 @@
             }
             if (usernameAttempts >= 3)
             {
-                Console.WriteLine("Du har skrivit fel för många gånger. Försök igen senare.");
+                Message.WriteLine(new Message("Du har skrivit fel för många gånger. Försök igen senare."));
                 isLockedOut = true;
                 return null;
             }
@@ -57,9 +57,9 @@
                 }
 
                 passwordAttempts++;
-                Console.WriteLine($"Fel lösenord! Försök kvar: {3 - passwordAttempts}");
+                Message.WriteLine(new Message($"Fel lösenord! Försök kvar: {3 - passwordAttempts}"));
             }
-            Console.WriteLine("Du har skrivit fel för många gånger. Försök igen senare.");
+            Message.WriteLine(new Message("Du har skrivit fel för många gånger. Försök igen senare."));
             isLockedOut = true;
 
             return null;

@@ -50,7 +50,8 @@ namespace Bank_App
                         break;
                     }
 
-                    Console.WriteLine("Du behöver välja ett alternativ.");
+                    //Console.WriteLine("Du behöver välja ett alternativ.");
+                    Message.WriteLine(new Message("Du behöver välja ett alternativ."));
                 }
 
                 if (userPick == 0)
@@ -75,19 +76,19 @@ namespace Bank_App
             Console.ResetColor();
         }
 
-        public static void DisplayText(string message, ConsoleColor? color = null)
-        {
-            ConsoleColor oldColor = Console.ForegroundColor;
+        //public static void DisplayText(string message, ConsoleColor? color = null)
+        //{
+        //    ConsoleColor oldColor = Console.ForegroundColor;
 
-            if (color != null)
-            {
-                Console.ForegroundColor = (ConsoleColor)color;
-            }
+        //    if (color != null)
+        //    {
+        //        Console.ForegroundColor = (ConsoleColor)color;
+        //    }
 
-            Console.WriteLine($"| {message,-24} |");
-            Console.WriteLine("+--------------------------+");
+        //    Console.WriteLine($"| {message,-24} |");
+        //    Console.WriteLine("+--------------------------+");
 
-            Console.ForegroundColor = oldColor;
-        }
+        //    Console.ForegroundColor = oldColor;
+        //}
     }
 }

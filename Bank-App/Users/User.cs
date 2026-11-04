@@ -60,12 +60,12 @@ namespace Bank_App
         // You always get a year interest for each loan?
         public MenuResult UserLoan()
         {
-            Console.WriteLine("Hur mycket pengar vill du låna av banken? (SEK):");
+            Message.WriteLine(new Message("Hur mycket pengar vill du låna av banken? (SEK):"));
             decimal loanAmount = UserInput.GetDecimal("Du behöver skriva in en siffra.");
 
             if (loanAmount <= 0m)
             {
-                Console.WriteLine("Summan är för låg.");
+                Message.WriteLine(new Message("Summan är för låg."));
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Continue;
             }
@@ -81,20 +81,20 @@ namespace Bank_App
 
             if (loanAmount > creditLimit || userCreditScore <= 20)
             {
-                Console.WriteLine("Ditt lån har inte blivit godkänt av banken.");
+                Message.WriteLine(new Message("Ditt lån har inte blivit godkänt av banken."));
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Continue;
             }
 
-            Console.WriteLine($"Din ansökan för ett belopp på {loanAmount:C} har blivit godkänd.");
-            Console.WriteLine($"Årsränta: {yearlyInterest:C}. Totalkostnad: {loanSum:C}.");
+            Message.WriteLine(new Message($"Din ansökan för ett belopp på {loanAmount:C} har blivit godkänd."));
+            Message.WriteLine(new Message($"Årsränta: {yearlyInterest:C}. Totalkostnad: {loanSum:C}."));
 
-            Console.WriteLine("Vilket konto vill du att pengarna ska överföras till?");
+            Message.WriteLine(new Message("Vilket konto vill du att pengarna ska överföras till?"));
             BankAccount? bankAccount = UserSelectAccount();
 
             if (bankAccount == null)
             {
-                Console.WriteLine("Du har inga konton.");
+                Message.WriteLine(new Message("Du har inga konton."));
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Continue;
             }
@@ -102,9 +102,9 @@ namespace Bank_App
             bankAccount.Deposit(loanAmount);
             if (bankAccount.displayCurrency != Currency.SEK)
             {
-                Console.WriteLine("Konverterar valuta.");
+                Message.WriteLine(new Message("Konverterar valuta."));
             }
-            Console.WriteLine($"Pengarna har överförts till {bankAccount.Name}.");
+            Message.WriteLine(new Message($"Pengarna har överförts till {bankAccount.Name}."));
 
             userLoanDebt += loanSum;
             return MenuResult.Continue;
@@ -113,27 +113,27 @@ namespace Bank_App
         {
             if (userLoanDebt <= 0m)
             {
-                Console.WriteLine("Du har inget att betala tillbaka.");
+                Message.WriteLine(new Message("Du har inget att betala tillbaka."));
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Continue;
             }
 
-            Console.WriteLine("Vilket konto vill du betala med?");
+            Message.WriteLine(new Message("Vilket konto vill du betala med?"));
             BankAccount? payingAccount = UserSelectAccount();
 
             if (payingAccount == null)
             {
-                Console.WriteLine("Du har inga konton.");
+                Message.WriteLine(new Message("Du har inga konton."));
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Continue;
             }
 
-            Console.WriteLine($"Hur mycket vill du betala tillbaka? ({payingAccount.displayCurrency.ToString()}):");
+            Message.WriteLine(new Message($"Hur mycket vill du betala tillbaka? ({payingAccount.displayCurrency.ToString()}):"));
             decimal amount = Bank.ExchangeRates.Convert(UserInput.GetDecimal("Du behöver skriva in en siffra."), payingAccount.displayCurrency, Currency.SEK);
 
             if (amount <= 0m)
             {
-                Console.WriteLine("Summan är för låg.");
+                Message.WriteLine(new Message("Summan är för låg."));
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Continue;
             }
@@ -143,19 +143,19 @@ namespace Bank_App
 
             if (payingAccount.GetBalance() < userPays)
             {
-                Console.WriteLine("För lågt saldo på konto.");
+                Message.WriteLine(new Message("För lågt saldo på konto."));
                 return MenuResult.Continue;
             }
 
             if (!payingAccount.Withdraw(userPays))
             {
-                Console.WriteLine("FEL: Det gick inte att ta pengar ur kontot.");
+                Message.WriteLine(new Message("FEL: Det gick inte att ta pengar ur kontot."));
                 return MenuResult.Continue;
             }
 
             userLoanDebt -= userPays;
 
-            Console.WriteLine($"Du har betalat tillbaka {payingAccount.getCurrencyDisplayString(userPays)} till banken.");
+            Message.WriteLine(new Message($"Du har betalat tillbaka {payingAccount.getCurrencyDisplayString(userPays)} till banken."));
             UserInput.WaitForUserConfirm();
             return MenuResult.Continue;
         }
@@ -169,11 +169,11 @@ namespace Bank_App
         {
             if (_accounts.Count >= BankAccount.MaxAccountAmount)
             {
-                Console.WriteLine($"Du kan inte skapa mer än {BankAccount.MaxAccountAmount} konton.");
+                Message.WriteLine(new Message($"Du kan inte skapa mer än {BankAccount.MaxAccountAmount} konton."));
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Continue;
             }
-            Console.WriteLine("1. Bankkonto\n2. Sparkonto");
+            Message.WriteLine(new Message("1. Bankkonto\n2. Sparkonto"));
             int accountTypeInput;
             while (true)
             {
@@ -183,12 +183,12 @@ namespace Bank_App
                 {
                     break;
                 }
-                Console.WriteLine("Välj ett alternativ ur listan.");
+                Message.WriteLine(new Message("Välj ett alternativ ur listan."));
             }
             bool isSavingsAccount = accountTypeInput == 2;
 
 
-            Console.WriteLine($"Ange ett namn för det nya kontot (max {BankAccount.MaxNameLength} tecken, inga mellanslag):");
+            Message.WriteLine(new Message($"Ange ett namn för det nya kontot (max {BankAccount.MaxNameLength} tecken, inga mellanslag):"));
             string input;
             string proposedName;
             while (true)
@@ -197,7 +197,7 @@ namespace Bank_App
 
                 if (input.Any(char.IsWhiteSpace))
                 {
-                    Console.WriteLine("Kontonamnet får inte innehålla mellanslag.");
+                    Message.WriteLine(new Message("Kontonamnet får inte innehålla mellanslag."));
                     continue;
                 }
 
@@ -209,25 +209,25 @@ namespace Bank_App
                     break;
                 }
 
-                Console.WriteLine($"Ditt namn är längre än {BankAccount.MaxNameLength} tecken.");
+                Message.WriteLine(new Message($"Ditt namn är längre än {BankAccount.MaxNameLength} tecken."));
             }
 
-            Console.WriteLine($"Är du säker på kontonamnet \"{proposedName}\"?");
+            Message.WriteLine(new Message($"Är du säker på kontonamnet \"{proposedName}\"?"));
 
             if (!UserInput.GetYesOrNo())
             {
-                Console.WriteLine("Avbryter.");
+                Message.WriteLine(new Message("Avbryter."));
                 return MenuResult.Continue;
             }
 
 
             if (AddAccount(proposedName, isSavingsAccount))
             {
-                Console.WriteLine("Ditt konto har skapats.");
+                Message.WriteLine(new Message("Ditt konto har skapats."));
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Rebuild;
             }
-            Console.WriteLine("Ditt konto kunde inte skapas då namnet redan används.");
+            Message.WriteLine(new Message("Ditt konto kunde inte skapas då namnet redan används."));
             UserInput.WaitForUserConfirm();
             return MenuResult.Continue;
         }
@@ -242,15 +242,15 @@ namespace Bank_App
 
                 if (this is Admin admin)
                 {
-                    Console.WriteLine("Vill du logga in som admin?");
+                    Message.WriteLine(new Message("Vill du logga in som admin?"));
                     if (UserInput.GetYesOrNo())
                     {
-                        Console.WriteLine("Loggar in som admin.");
+                        Message.WriteLine(new Message("Loggar in som admin."));
                         admin.DisplayAdminMenu();
                         return MenuResult.Continue;
                     }
 
-                    Console.WriteLine("Loggar in som användare.");
+                    Message.WriteLine(new Message("Loggar in som användare."));
                 }
 
                 do
@@ -284,12 +284,13 @@ namespace Bank_App
 
         private MenuResult DisplayUserInfo()
         {
-            Console.WriteLine("------");
-            Console.WriteLine($"Namn: N/A");
-            Console.WriteLine($"Email: N/A");
-            Console.WriteLine($"Telefon: N/A");
-            Console.WriteLine($"Du är skyldig att betala tillbaka {userLoanDebt} till banken.");
-            Console.WriteLine($"Din kreditvärdighet är {userCreditScore}");
+            Message.WriteLine(new Message(
+                $"Namn: N/A" +
+                $"\nEmail: N/A" +
+                $"\nTelefon: N/A" +
+                $"\nDu är skyldig att betala tillbaka {userLoanDebt} till banken." +
+                $"\nDin kreditvärdighet är {userCreditScore}"
+                ));
             UserInput.WaitForUserConfirm();
             return MenuResult.Continue;
         }
@@ -300,11 +301,12 @@ namespace Bank_App
             {
                 new MenuOption("Visa info.", () =>
                 {
-                     Console.WriteLine("------");
-                     Console.WriteLine($"Kontonamn: {account.Name}");
-                     Console.WriteLine($"Kontotyp: {account.AccountType}");
-                     Console.WriteLine($"Valuta: {account.displayCurrency.ToString()}");
-                     Console.WriteLine($"Saldo: {account.getCurrencyDisplayString(account.GetBalance())}");
+                    Message.WriteLine(new Message(
+                        $"Kontonamn: {account.Name}" +
+                        $"\nKontotyp: {account.AccountType}" +
+                        $"\nValuta: {account.displayCurrency.ToString()}" +
+                        $"\nSaldo: {account.getCurrencyDisplayString(account.GetBalance())}"
+                        ));
                      if (account is SavingsAccount savingsAccount)
                      {
                          savingsAccount.ShowSavingsInterest();
@@ -339,67 +341,67 @@ namespace Bank_App
 
         private MenuResult StartUserTransaction(BankAccount account)
         {
-            Console.WriteLine("Vill du föra över til dig själv?");
+            Message.WriteLine(new Message("Vill du föra över til dig själv?"));
             if (UserInput.GetYesOrNo())
             {
-                Console.WriteLine("Vilket konto vill du föra över till?");
+                Message.WriteLine(new Message("Vilket konto vill du föra över till?"));
                 BankAccount? targetedAccount = UserSelectAccount();
 
                 if (targetedAccount != null && targetedAccount != account)
                 {
-                    Console.WriteLine($"Hur mycket vill du föra över?: ({account.displayCurrency.ToString()})");
+                    Message.WriteLine(new Message($"Hur mycket vill du föra över?: ({account.displayCurrency.ToString()})"));
                     decimal transferAmount = Bank.ExchangeRates.Convert(UserInput.GetDecimal("Du behöver skriva in en siffra."), account.displayCurrency, Currency.SEK);
 
                     account.Transactions(targetedAccount, transferAmount);
                 }
                 else if (targetedAccount == account)
                 {
-                    Console.WriteLine("Du kan inte föra över till samma konto");
+                    Message.WriteLine(new Message("Du kan inte föra över till samma konto"));
                     UserInput.WaitForUserConfirm();
                 }
                 else
                 {
-                    Console.WriteLine($"Inget konto hittades.");
+                    Message.WriteLine(new Message($"Inget konto hittades."));
                     UserInput.WaitForUserConfirm();
                 }
             }
             else
             {
-                Console.WriteLine("Vilken användare vill du föra över till?");
+                Message.WriteLine(new Message("Vilken användare vill du föra över till?"));
                 string input = UserInput.GetString();
 
                 User? targetedUser = Bank.UserDatabase.GetUserWithUsername(input);
                 if (targetedUser != null)
                 {
-                    Console.WriteLine("Ange namnet på kontot som du vill föra över till:");
+                    Message.WriteLine(new Message("Ange namnet på kontot som du vill föra över till:"));
                     string userAccountTargetString = UserInput.GetString("Felaktig inmatning.");
 
                     BankAccount? targetedAccount = targetedUser.GetAccountWithName(userAccountTargetString);
 
                     if (targetedAccount != null)
                     {
-                        Console.WriteLine($"Hur mycket vill du föra över? ({account.displayCurrency.ToString()}):");
+                        Message.WriteLine(new Message($"Hur mycket vill du föra över? ({account.displayCurrency.ToString()}):"));
                         decimal transferAmount = Bank.ExchangeRates.Convert(UserInput.GetDecimal("Du behöver skriva in en siffra."), account.displayCurrency, Currency.SEK);
 
                         if (account.Transactions(targetedAccount, transferAmount))
                         {
-                            Console.WriteLine($"Du förde över {account.getCurrencyDisplayString(transferAmount)} till {targetedAccount.Name}.");
+                            Message.WriteLine(new Message($"Du förde över {account.getCurrencyDisplayString(transferAmount)} till {targetedAccount.Name}."));
                         }
                         else
                         {
-                            Console.WriteLine("Det gick inte att föra över.");
+                            Message.WriteLine(new Message("Det gick inte att föra över."));
                         }
                         UserInput.WaitForUserConfirm();
                     }
                     else
                     {
-                        Console.WriteLine($"Kunde inte hitta något konto med namnet {userAccountTargetString}");
+                        Message.WriteLine(new Message($"Kunde inte hitta något konto med namnet {userAccountTargetString}"));
                         UserInput.WaitForUserConfirm();
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"Kunde inte hitta en användare med namnet {input}.");
+                    Message.WriteLine(new Message($"Kunde inte hitta en användare med namnet {input}."));
                     UserInput.WaitForUserConfirm();
                 }
             }
@@ -409,7 +411,7 @@ namespace Bank_App
         {
             if (account.TransactionsHistory.Count == 0)
             {
-                Console.WriteLine("Din transaktions historik är tom.");
+                Message.WriteLine(new Message("Din transaktions historik är tom."));
                 return MenuResult.Continue;
             }
             foreach (var transaction in account.TransactionsHistory)
@@ -418,7 +420,7 @@ namespace Bank_App
             }
             if (account.PendingTransactionsList.Count > 0)
             {
-                Console.WriteLine("\n--- Väntande överföringar ---");
+                Message.WriteLine(new Message("\n--- Väntande överföringar ---"));
                 foreach (var pending in account.PendingTransactionsList)
                 {
                     Console.WriteLine($"{account.getCurrencyDisplayString(pending.Amount)} till {account.Name}, genomförs kl {pending.TransactionTime:HH:mm:ss}");
