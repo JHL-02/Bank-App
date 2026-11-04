@@ -1,14 +1,25 @@
-﻿using System.Drawing;
-
-namespace Bank_App
+﻿namespace Bank_App
 {
+    enum MessageType
+    {
+        STANDARD,
+        ERROR,
+        INPUT
+    }
     internal class Message
     {
         public string Text { get; init; }
+        public MessageType MsgType { get; init; }
         public ConsoleColor? Color { get; private set; } = ConsoleColor.Cyan;
-        public Message(string text)
+        public Message(string text, MessageType msgType = MessageType.STANDARD)
         {
             Text = text;
+            MsgType = msgType;
+
+            if (MsgType == MessageType.ERROR)
+            {
+                Color = ConsoleColor.Red;
+            }
         }
 
         public Message SetColor(ConsoleColor? color)
@@ -20,14 +31,38 @@ namespace Bank_App
         public static void WriteLine(Message message)
         {
             ConsoleColor oldColor = Console.ForegroundColor;
+
             if (message.Color != null)
             {
-                Console.ForegroundColor = (ConsoleColor)message.Color!;
+                Console.ForegroundColor = (ConsoleColor)message.Color;
             }
 
-            Console.WriteLine("+--------------------------+");
-            Console.WriteLine($"| {message.Text,-24} |");
-            Console.WriteLine("+--------------------------+");
+            string[] lines = message.Text.Split('\n');
+
+            int width = Math.Max(24, lines.Max(line => line.TrimEnd('\r').Length));
+
+            string border = "+" + new string('-', width + 2) + "+";
+
+            Console.WriteLine(border);
+
+            foreach (string line in lines)
+            {
+                string cleanLine = line.TrimEnd('\r');
+                Console.WriteLine($"| {cleanLine.PadRight(width)} |");
+            }
+
+            if (message.MsgType == MessageType.INPUT)
+            {
+                Console.WriteLine($"| {"".PadRight(width)} |");
+                Console.WriteLine(border);
+
+                // Move cursor back inside the box
+                Console.SetCursorPosition(2, Console.CursorTop - 2);
+            }
+            else
+            {
+                Console.WriteLine(border);
+            }
 
             Console.ForegroundColor = oldColor;
         }

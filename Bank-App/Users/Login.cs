@@ -25,7 +25,7 @@
 
             for (usernameAttempts = 0; usernameAttempts < 3; usernameAttempts++)
             {
-                Console.Write("Ange användarnamn: ");
+                Message.WriteLine(new Message("Ange användarnamn: ", MessageType.INPUT));
                 string username = UserInput.GetString();
 
                 user = _database.GetUserWithUsername(username);
@@ -47,7 +47,7 @@
             int passwordAttempts = 0;
             while (passwordAttempts < 3)
             {
-                Console.Write("Lösenord: ");
+                Message.WriteLine(new Message ("Lösenord: ", MessageType.INPUT));
                 string password = UserInput.GetString();
 
                 if (user != null && user.CheckPassword(password))

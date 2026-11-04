@@ -11,6 +11,7 @@
             string? input = Console.ReadLine();
 
             Console.ForegroundColor = oldColor;
+
             return input;
         }
 
@@ -68,7 +69,7 @@
 
                 if (invalidInputMessage != null)
                 {
-                    Message.WriteLine(new Message(invalidInputMessage));
+                    Message.WriteLine(new Message(invalidInputMessage, MessageType.INPUT));
                 }
             }
         }
@@ -84,7 +85,7 @@
 
                 if (invalidInputMessage != null)
                 {
-                    Message.WriteLine(new Message(invalidInputMessage));
+                    Message.WriteLine(new Message(invalidInputMessage, MessageType.INPUT));
                 }
             }
         }
