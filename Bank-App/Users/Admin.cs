@@ -34,22 +34,22 @@
         private MenuResult UpdateExchangeRate()
         {
             Bank.ExchangeRates.ShowRate();
-            Console.WriteLine("Vilken valuta vill du uppdatera?");
+            Message.WriteLine(new Message("Vilken valuta vill du uppdatera?", MessageType.INPUT));
             List<Currency> currencies = Enum.GetValues<Currency>().Where(c => c != Currency.SEK).ToList();
             Currency? chosenCurrency = UserInput.UserGetObjectFromList(currencies, c => c.ToString());
             if (chosenCurrency == null)
             {
                 return MenuResult.Continue;
             }
-            Console.WriteLine($"Ange ny kurs: hur många SEK är 1 {chosenCurrency}?");
+            Message.WriteLine(new Message($"Ange ny kurs: hur många SEK är 1 {chosenCurrency}?", MessageType.INPUT));
             decimal newRate = UserInput.GetDecimal();
             if (Bank.ExchangeRates.UpdateRate(chosenCurrency.Value, newRate))
             {
-                Console.WriteLine($"Kursen för {chosenCurrency} har uppdaterats.");
+                Message.WriteLine(new Message($"Kursen för {chosenCurrency} har uppdaterats."));
             }
             else
             {
-                Console.WriteLine("Kursen kunde inte uppdateras. Den måste vara större än 0.");
+                Message.WriteLine(new Message("Kursen kunde inte uppdateras. Den måste vara större än 0.", MessageType.ERROR));
             }
             UserInput.WaitForUserConfirm();
             return MenuResult.Continue;
@@ -57,9 +57,12 @@
 
         private MenuResult AddUser()
         {
-            Console.WriteLine("Vilken typ av användare vill du lägga till?");
-            Console.WriteLine("1. Vanlig användare.");
-            Console.WriteLine("2. Admin användare.");
+            Message.WriteLine(new Message("Vilken typ av användare vill du lägga till?", MessageType.INPUT));
+            Message.WriteLine(new Message
+                (
+                "1. Vanlig användare.\n" +
+                "2. Admin användare."
+                ));
             int userInput;
             while (true)
             {
@@ -83,51 +86,51 @@
                     isAdmin = false;
                     break;
             }
-            Console.WriteLine("Ange ett användarnamn för kontot:");
+            Message.WriteLine(new Message("Ange ett användarnamn för kontot:", MessageType.INPUT));
             string username = UserInput.GetString();
 
-            Console.WriteLine("Ange ett lösenord för kontot:");
+            Message.WriteLine(new Message("Ange ett lösenord för kontot:", MessageType.INPUT));
             string password = UserInput.GetString();
 
             if (Bank.UserDatabase.AddUser(username, password, isAdmin))
             {
-                Console.WriteLine($"Kontot {username} har skapats!");
+                Message.WriteLine(new Message($"Kontot {username} har skapats!"));
             }
             else
             {
-                Console.WriteLine($"Kontot {username} kunde inte skapas då användarnamnet redan existerar.");
+                Message.WriteLine(new Message($"Kontot {username} kunde inte skapas då användarnamnet redan existerar.", MessageType.ERROR));
             }
             return MenuResult.Continue;
         }
 
         private MenuResult AddBalance()
         {
-            Console.WriteLine("Vilken användare ska få pengar?");
+            Message.WriteLine(new Message("Vilken användare ska få pengar?", MessageType.INPUT));
             string userString = UserInput.GetString();
             User? targetedUser = Bank.UserDatabase.GetUserWithUsername(userString);
 
             if (targetedUser == null)
             {
-                Console.WriteLine($"Användaren finns inte i systemet.:");
+                Message.WriteLine(new Message($"Användaren finns inte i systemet.:", MessageType.ERROR));
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Continue;
             }
 
-            Console.WriteLine("Vilket av deras konton ska få pengar?:");
+            Message.WriteLine(new Message("Vilket av deras konton ska få pengar?:", MessageType.INPUT));
             BankAccount? targetedAccount = targetedUser.UserSelectAccount();
 
             if (targetedAccount == null)
             {
-                Console.WriteLine($"Inget konto hittades.");
+                Message.WriteLine(new Message($"Inget konto hittades.", MessageType.ERROR));
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Continue;
             }
 
-            Console.WriteLine("Hur mycket saldo ska läggas till?:");
+            Message.WriteLine(new Message("Hur mycket saldo ska läggas till?:", MessageType.INPUT));
             decimal addAmmount = UserInput.GetDecimal();
 
             targetedAccount.Deposit(addAmmount);
-            Console.WriteLine($"{addAmmount} saldo har tilldelats till \"{targetedAccount.Name}\"");
+            Message.WriteLine(new Message($"{addAmmount} saldo har tilldelats till \"{targetedAccount.Name}\""));
             UserInput.WaitForUserConfirm();
 
             return MenuResult.Continue;

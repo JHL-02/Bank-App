@@ -54,16 +54,16 @@
 
         public void ShowRate()
         {
-            Console.WriteLine("--- Växelkurser ---");
+            Message.WriteLine(new Message("--- Växelkurser ---"));
             foreach (KeyValuePair<Currency, decimal> rate in rates)
             {
                 if (rate.Key == Currency.SEK)
                 {
                     continue;
                 }
-                Console.WriteLine($"1 {rate.Key} = {rate.Value} SEK");
+                Message.WriteLine(new Message($"1 {rate.Key} = {rate.Value} SEK"));
             }
-            Console.WriteLine($"Senast uppdaterad: {UpdatedOn:yyyy-MM-dd}");
+            Message.WriteLine(new Message($"Senast uppdaterad: {UpdatedOn:yyyy-MM-dd}"));
         }
         
     }

@@ -25,13 +25,13 @@
 
             for (usernameAttempts = 0; usernameAttempts < 3; usernameAttempts++)
             {
-                Console.Write("Ange användarnamn: ");
+                Message.WriteLine(new Message("Ange användarnamn: ", MessageType.INPUT));
                 string username = UserInput.GetString();
 
                 user = _database.GetUserWithUsername(username);
                 if (user == null)
                 {
-                    Console.WriteLine($"Användare hittades inte. Försök kvar: {2 - usernameAttempts}");
+                    Message.WriteLine(new Message($"Användare hittades inte. Försök kvar: {2 - usernameAttempts}", MessageType.ERROR));
                     continue;
                 }
 
@@ -39,7 +39,7 @@
             }
             if (usernameAttempts >= 3)
             {
-                Console.WriteLine("Du har skrivit fel för många gånger. Försök igen senare.");
+                Message.WriteLine(new Message("Du har skrivit fel för många gånger. Försök igen senare.", MessageType.ERROR));
                 isLockedOut = true;
                 return null;
             }
@@ -47,7 +47,7 @@
             int passwordAttempts = 0;
             while (passwordAttempts < 3)
             {
-                Console.Write("Lösenord: ");
+                Message.WriteLine(new Message ("Lösenord: ", MessageType.INPUT));
                 string password = UserInput.GetString();
 
                 if (user != null && user.CheckPassword(password))
@@ -57,9 +57,9 @@
                 }
 
                 passwordAttempts++;
-                Console.WriteLine($"Fel lösenord! Försök kvar: {3 - passwordAttempts}");
+                Message.WriteLine(new Message($"Fel lösenord! Försök kvar: {3 - passwordAttempts}", MessageType.ERROR));
             }
-            Console.WriteLine("Du har skrivit fel för många gånger. Försök igen senare.");
+            Message.WriteLine(new Message("Du har skrivit fel för många gånger. Försök igen senare.", MessageType.ERROR));
             isLockedOut = true;
 
             return null;
