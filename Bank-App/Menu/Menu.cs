@@ -1,4 +1,6 @@
-﻿namespace Bank_App
+﻿using System.Drawing;
+
+namespace Bank_App
 {
     internal class Menu
     {
@@ -15,26 +17,34 @@
 
         public MenuResult Display()
         {
-            MenuResult menuResult = MenuResult.Continue;
             while (true)
             {
-                DisplayMenuHeader(Title, defaultColor);
+                int width = Math.Max(
+                    24,
+                    Math.Max(
+                        Title.Length,
+                        Math.Max(
+                            LeaveMenuString.Length + 3,
+                            Options.Max(o => o.Title.Length + 3)
+                        )
+                    )
+                );
+
+                DisplayMenuHeader(Title, defaultColor, width);
+
                 for (int i = 0; i < Options.Count; i++)
                 {
-                    if (Options[i].Color is ConsoleColor color)
-                    {
-                        Console.ForegroundColor = color;
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                    }
-                    Console.WriteLine($"| {i + 1}. {Options[i].Title,-21} |");
+                    Console.ForegroundColor = Options[i].Color ?? ConsoleColor.Yellow;
+
+                    Console.WriteLine($"| {i + 1}. {Options[i].Title.PadRight(width - 3)} |");
                 }
+
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"| 0. {LeaveMenuString,-21} |");
+                Console.WriteLine($"| 0. {LeaveMenuString.PadRight(width - 3)} |");
+
                 Console.ForegroundColor = defaultColor;
-                Console.WriteLine("+--------------------------+");
+                Console.WriteLine("+" + new string('-', width + 2) + "+");
+
                 Console.ResetColor();
 
                 int userPick;
@@ -44,32 +54,31 @@
                     userPick = UserInput.GetInt();
 
                     if (userPick >= 0 && userPick <= Options.Count)
-                    {
                         break;
-                    }
 
-                    Console.WriteLine("Du behöver välja ett alternativ.");
+                    Message.WriteLine(new Message("Du behöver välja ett alternativ."));
                 }
 
                 if (userPick == 0)
-                {
                     return MenuResult.Exit;
-                }
 
-                menuResult = Options[userPick - 1].Execute();
+                MenuResult menuResult = Options[userPick - 1].Execute();
 
                 if (menuResult != MenuResult.Continue)
-                {
                     return menuResult;
-                }
             }
         }
-        private static void DisplayMenuHeader(string title, ConsoleColor color)
+
+        private static void DisplayMenuHeader(string title, ConsoleColor color, int width)
         {
             Console.ForegroundColor = color;
-            Console.WriteLine("+--------------------------+");
-            Console.WriteLine($"| {title,-24} |");
-            Console.WriteLine("+--------------------------+");
+
+            string border = "+" + new string('-', width + 2) + "+";
+
+            Console.WriteLine(border);
+            Console.WriteLine($"| {title.PadRight(width)} |");
+            Console.WriteLine(border);
+
             Console.ResetColor();
         }
     }

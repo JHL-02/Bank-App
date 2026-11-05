@@ -59,19 +59,19 @@ namespace Bank_App
         {
             if (targetedAccount == this)
             {
-                Console.WriteLine("Du kan inte överföra till samma konto.");
+                Message.WriteLine(new Message("Du kan inte överföra till samma konto.", MessageType.ERROR));
                 return false;
             }
 
             if (transferAmount <= 0)
             {
-                Console.WriteLine("Du kan inte överföra 0 eller mindre pengar.");
+                Message.WriteLine(new Message("Du kan inte överföra 0 eller mindre pengar.", MessageType.ERROR));
                 return false;
             }
 
             if (transferAmount > Balance || Balance <= 0)
             {
-                Console.WriteLine("För litet saldo");
+                Message.WriteLine(new Message("För litet saldo", MessageType.ERROR));
                 return false;
             }
             else
@@ -113,19 +113,22 @@ namespace Bank_App
             while (PendingTransactionsList.Count > 0)
             {
                 var transaction = PendingTransactionsList.Pop();
-                //Avsändarens rad ska inte sättas in på kontot igen.
-                // Pengarna drogs redan i Transactions.
+                if (!transaction.IsSender)
+                {
+                    Deposit(transaction.Amount);
+                }
+                
                 if (transaction.IsSender)
                 {
-                    TransactionsHistory.Add($"{Name} skickade {getCurrencyDisplayString(transaction.Amount)} till {transaction.AccountName} {DateTime.Now}");
-                    continue;
+                    TransactionsHistory.Add($"{transaction.AccountName} tog emot {transaction.Amount}kr från dig {DateTime.Now}");
                 }
-
-                Deposit(transaction.Amount);
+                else
+                {
+                    TransactionsHistory.Add($"{transaction.AccountName} skickade {transaction.Amount}kr till dig {DateTime.Now}");
+                }
                 
-                TransactionsHistory.Add($"{transaction.AccountName} skickade {getCurrencyDisplayString(transaction.Amount)} till dig {DateTime.Now}"); //Summan är redan i det här kontots valuta. Skriv inte kr på allt.
-
-
+                
+                
             }
             //accountOwner.MarkTransactionsUpdated();
         }

@@ -2,11 +2,24 @@
 {
     internal static class UserInput
     {
+        public static string? ReadLine()
+        {
+            ConsoleColor oldColor = Console.ForegroundColor;
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+            string? input = Console.ReadLine();
+
+            Console.ForegroundColor = oldColor;
+
+            return input;
+        }
+
         public static string GetString(string? invalidInputMessage = "Du måste skriva in något.")
         {
             while (true)
             {
-                string input = Console.ReadLine() ?? "";
+                string input = UserInput.ReadLine() ?? "";
 
                 if (!string.IsNullOrWhiteSpace(input))
                 {
@@ -15,7 +28,7 @@
 
                 if (invalidInputMessage != null)
                 {
-                    Console.WriteLine(invalidInputMessage);
+                    Message.WriteLine(new Message(invalidInputMessage, MessageType.INPUT));
                 }
             }
         }
@@ -24,7 +37,7 @@
         {
             while (true)
             {
-                string input = Console.ReadLine() ?? "";
+                string input = UserInput.ReadLine() ?? "";
 
                 if (!string.IsNullOrWhiteSpace(input))
                 {
@@ -40,7 +53,7 @@
 
                 if (invalidInputMessage != null)
                 {
-                    Console.WriteLine(invalidInputMessage);
+                    Message.WriteLine(new Message(invalidInputMessage, MessageType.INPUT));
                 }
             }
         }
@@ -49,14 +62,14 @@
         {
             while (true)
             {
-                if (int.TryParse(Console.ReadLine() ?? "", out int number))
+                if (int.TryParse(UserInput.ReadLine() ?? "", out int number))
                 {
                     return number;
                 }
 
                 if (invalidInputMessage != null)
                 {
-                    Console.WriteLine(invalidInputMessage);
+                    Message.WriteLine(new Message(invalidInputMessage, MessageType.INPUT));
                 }
             }
         }
@@ -65,21 +78,21 @@
         {
             while (true)
             {
-                if (decimal.TryParse(Console.ReadLine() ?? "", out decimal number))
+                if (decimal.TryParse(UserInput.ReadLine() ?? "", out decimal number))
                 {
                     return number;
                 }
 
                 if (invalidInputMessage != null)
                 {
-                    Console.WriteLine(invalidInputMessage);
+                    Message.WriteLine(new Message(invalidInputMessage, MessageType.INPUT));
                 }
             }
         }
 
         public static void WaitForUserConfirm(string message = "Tryck på valfri knapp för att fortsätta.")
         {
-            Console.WriteLine(message);
+            Message.WriteLine(new Message(message));
 
             Console.ReadKey(true);
         }
@@ -93,7 +106,7 @@
 
             for (int i = 0; i < list.Count; i++)
             {
-                Console.WriteLine($"{i + 1}. {getName(list[i])}");
+                Message.WriteLine(new Message($"{i + 1}. {getName(list[i])}"));
             }
 
             int input = 0;
@@ -104,7 +117,7 @@
                 {
                     return list[input - 1];
                 }
-                Console.WriteLine("Felaktig inmatning.");
+                Message.WriteLine(new Message("Felaktig inmatning.", MessageType.ERROR));
             }
         }
     }
