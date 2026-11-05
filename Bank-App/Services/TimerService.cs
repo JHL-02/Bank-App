@@ -8,7 +8,7 @@
         {
             while (true)
             {
-                await Task.Delay(TimeSpan.FromSeconds(10));
+                await Task.Delay(TimeSpan.FromSeconds(60));
                 transactionMethod();
 
                 OnTimerTick?.Invoke();

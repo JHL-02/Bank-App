@@ -407,7 +407,7 @@
         }
         private MenuResult TransactionHistory(BankAccount account)
         {
-            if (account.TransactionsHistory.Count == 0)
+            if (account.TransactionsHistory.Count == 0 && account.PendingTransactionsList.Count == 0)
             {
                 Message.WriteLine(new Message("Din transaktions historik är tom."));
                 return MenuResult.Continue;
@@ -415,14 +415,28 @@
             foreach (var transaction in account.TransactionsHistory)
             {
                 Console.WriteLine(transaction);
+                Console.WriteLine("Din transaktions historik är tom.");
+                //return MenuResult.Continue;
             }
             if (account.PendingTransactionsList.Count > 0)
             {
                 Message.WriteLine(new Message("\n--- Väntande överföringar ---"));
                 foreach (var pending in account.PendingTransactionsList)
                 {
-                    Console.WriteLine($"{account.getCurrencyDisplayString(pending.Amount)} till {account.Name}, genomförs kl {pending.TransactionTime:HH:mm:ss}");
+                    if (pending.IsSender)
+                    {
+                        Console.WriteLine($"{account.getCurrencyDisplayString(pending.Amount)} skickas till {pending.AccountName} kl {pending.TransactionTime:HH:mm:ss}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{account.getCurrencyDisplayString(pending.Amount)} från {pending.AccountName}, genomförs kl {pending.TransactionTime:HH:mm:ss}");
+                    }
+                    
                 }
+            }
+            foreach (var transaction in account.TransactionsHistory)
+            {
+                Console.WriteLine(transaction);
             }
             return MenuResult.Continue;
         }
