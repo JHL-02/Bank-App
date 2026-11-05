@@ -1,4 +1,6 @@
-﻿namespace Bank_App
+﻿using System.Text;
+
+namespace Bank_App
 {
     internal class User
     {
@@ -413,27 +415,31 @@
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Continue;
             }
-           
+
+            StringBuilder sb = new StringBuilder();
             if (account.PendingTransactionsList.Count > 0)
             {
                 Message.WriteLine(new Message("\n--- Väntande överföringar ---"));
+
                 foreach (var pending in account.PendingTransactionsList)
                 {
                     if (pending.IsSender)
                     {
-                        Console.WriteLine($"{account.getCurrencyDisplayString(pending.Amount)} skickas till {pending.AccountName} kl {pending.TransactionTime:HH:mm:ss}");
+                        sb.AppendLine($"{account.getCurrencyDisplayString(pending.Amount)} skickas till {pending.AccountName} kl {pending.TransactionTime:HH:mm:ss}");
                     }
                     else
                     {
-                        Console.WriteLine($"{account.getCurrencyDisplayString(pending.Amount)} från {pending.AccountName}, genomförs kl {pending.TransactionTime:HH:mm:ss}");
+                        sb.AppendLine($"{account.getCurrencyDisplayString(pending.Amount)} skickas till {pending.AccountName} kl {pending.TransactionTime:HH:mm:ss}");
                     }
-                    
                 }
+                Message.WriteLine(new Message(sb.ToString()));
+                sb.Clear();
             }
             foreach (var transaction in account.TransactionsHistory)
             {
-                Console.WriteLine(transaction);
+                sb.AppendLine(transaction);
             }
+            Message.WriteLine(new Message(sb.ToString()));
             return MenuResult.Continue;
         }
 
