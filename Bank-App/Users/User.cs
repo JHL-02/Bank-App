@@ -410,14 +410,10 @@
             if (account.TransactionsHistory.Count == 0 && account.PendingTransactionsList.Count == 0)
             {
                 Message.WriteLine(new Message("Din transaktions historik är tom."));
+                UserInput.WaitForUserConfirm();
                 return MenuResult.Continue;
             }
-            foreach (var transaction in account.TransactionsHistory)
-            {
-                Console.WriteLine(transaction);
-                Console.WriteLine("Din transaktions historik är tom.");
-                //return MenuResult.Continue;
-            }
+           
             if (account.PendingTransactionsList.Count > 0)
             {
                 Message.WriteLine(new Message("\n--- Väntande överföringar ---"));
