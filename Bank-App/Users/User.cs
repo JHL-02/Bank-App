@@ -423,13 +423,16 @@ namespace Bank_App
 
                 foreach (var pending in account.PendingTransactionsList)
                 {
+                    if (sb.Length > 0)
+                        sb.AppendLine();
+
                     if (pending.IsSender)
                     {
-                        sb.AppendLine($"{account.getCurrencyDisplayString(pending.Amount)} skickas till {pending.AccountName} kl {pending.TransactionTime:HH:mm:ss}");
+                        sb.Append($"{account.getCurrencyDisplayString(pending.Amount)} skickas till {pending.AccountName} kl {pending.TransactionTime:HH:mm:ss}");
                     }
                     else
                     {
-                        sb.AppendLine($"{account.getCurrencyDisplayString(pending.Amount)} skickas till {pending.AccountName} kl {pending.TransactionTime:HH:mm:ss}");
+                        sb.Append($"{account.getCurrencyDisplayString(pending.Amount)} skickas till {pending.AccountName} kl {pending.TransactionTime:HH:mm:ss}");
                     }
                 }
                 Message.WriteLine(new Message(sb.ToString()));
@@ -437,7 +440,10 @@ namespace Bank_App
             }
             foreach (var transaction in account.TransactionsHistory)
             {
-                sb.AppendLine(transaction);
+                if (sb.Length > 0)
+                    sb.AppendLine();
+
+                sb.Append(string.Join(Environment.NewLine, transaction));
             }
             Message.WriteLine(new Message(sb.ToString()));
             return MenuResult.Continue;
