@@ -15,7 +15,7 @@
             {
                 if (Login.isLockedOut)
                 {
-                    Message.WriteLine(new Message("Du har gjort för många felförsök."));
+                    Message.WriteLine(new Message("Du har gjort för många felförsök.", MessageType.ERROR));
                     return MenuResult.Continue;
                 }
 
@@ -70,25 +70,23 @@
 
         public static decimal AdjustCreditRate()
         {
-            Console.WriteLine(
-                //$"Standardränta: {loanCreditRate:P} för alla kunder.\n" +
-                //$"Ny kund börjar med: {DefaultUserCreditScore} i kreditvärdighet.\n" +
+            Message.WriteLine(new Message(
                 "1. Öka räntenivå baserat på kreditvärdighet.\n" +
                 "2. Minska räntenivå baserat på kreditvärdighet.\n" +
                 "3. Valfri räntemängd.\n" +
-                "4. Avsluta.");
+                "4. Avsluta.", MessageType.INPUT));
 
             switch (UserInput.GetInt())
             {
                 case 1:
-                    Console.WriteLine(
+                    Message.WriteLine(new Message(
                         $"Räntan baseras på kreditvärdighet. Kunder med kreditvärdighet under 60 poäng får {loanExtraCreditRate:P} ränta istället för {loanCreditRate:P}.\n" +
                         $"1. Addera mer på räntan.\n" +
-                        $"2. Avsluta.\n");
+                        $"2. Avsluta.\n", MessageType.INPUT));
                     switch (UserInput.GetInt())
                     {
                         case 1:
-                            Message.WriteLine(new Message("Ange hur mycket räntan ska ökas (t.ex. 0.01 för 1 procentenhet):"));
+                            Message.WriteLine(new Message("Ange hur mycket räntan ska ökas (t.ex. 0.01 för 1 procentenhet):", MessageType.INPUT));
                             decimal increase = UserInput.GetDecimal();
                             if (increase > 0m)
                             {
@@ -97,7 +95,7 @@
                             }
                             else
                             {
-                                Message.WriteLine(new Message("Ökningen måste vara mer än 0."));
+                                Message.WriteLine(new Message("Ökningen måste vara mer än 0.", MessageType.ERROR));
                             }
                             break;
                         case 2:
@@ -112,12 +110,12 @@
                     switch (UserInput.GetInt())
                     {
                         case 1:
-                            Message.WriteLine(new Message("Ange hur mycket räntan ska minskas (t.ex. 0.01 för 1 procentenhet):"));
+                            Message.WriteLine(new Message("Ange hur mycket räntan ska minskas (t.ex. 0.01 för 1 procentenhet):", MessageType.INPUT));
                             decimal reduction = UserInput.GetDecimal();
 
                             if (reduction <= 0m)
                             {
-                                Message.WriteLine(new Message("Minskningen måste vara mer än 0."));
+                                Message.WriteLine(new Message("Minskningen måste vara mer än 0.", MessageType.ERROR));
                                 break;
                             }
 
@@ -130,18 +128,18 @@
                             }
                             else
                             {
-                                Message.WriteLine(new Message("Räntan kan inte bli negativ."));
+                                Message.WriteLine(new Message("Räntan kan inte bli negativ.", MessageType.ERROR));
                             }
                             break;
                         case 2:
                             break;
                         default:
-                            Message.WriteLine(new Message("Felaktig inmatning. Vänligen ange ett nummer mellan 1-2."));
+                            Message.WriteLine(new Message("Felaktig inmatning. Vänligen ange ett nummer mellan 1-2.", MessageType.ERROR));
                             break;
                     }
                     break;
                 case 3:
-                    Message.WriteLine(new Message("Ange ett nytt standardvärde för standardränta hos banken (t.ex. 0.01 för 1 procentenhet):"));
+                    Message.WriteLine(new Message("Ange ett nytt standardvärde för standardränta hos banken (t.ex. 0.01 för 1 procentenhet):", MessageType.INPUT));
                     decimal newRate = UserInput.GetDecimal();
                     if (newRate >= 0m && newRate <= 1m)
                     {
@@ -149,14 +147,14 @@
                     }
                     else
                     {
-                        Message.WriteLine(new Message("Talet kan bara vara mellan än 0-1. (t.ex. 0.01 för 1 procentenhet)"));
+                        Message.WriteLine(new Message("Talet kan bara vara mellan än 0-1. (t.ex. 0.01 för 1 procentenhet)", MessageType.ERROR));
                     }
                     break;
                 case 4:
                     Console.Clear();
                     break;
                 default:
-                    Message.WriteLine(new Message("Felaktig inmatning. Vänligen ange ett nummer mellan 1-4."));
+                    Message.WriteLine(new Message("Felaktig inmatning. Vänligen ange ett nummer mellan 1-4.", MessageType.ERROR));
                     break;
             }
             return loanCreditRate;

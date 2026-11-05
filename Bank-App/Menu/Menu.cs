@@ -81,20 +81,5 @@ namespace Bank_App
 
             Console.ResetColor();
         }
-
-        //public static void DisplayText(string message, ConsoleColor? color = null)
-        //{
-        //    ConsoleColor oldColor = Console.ForegroundColor;
-
-        //    if (color != null)
-        //    {
-        //        Console.ForegroundColor = (ConsoleColor)color;
-        //    }
-
-        //    Console.WriteLine($"| {message,-24} |");
-        //    Console.WriteLine("+--------------------------+");
-
-        //    Console.ForegroundColor = oldColor;
-        //}
     }
 }

@@ -15,11 +15,15 @@
             if (Balance > 0)
             {
                 decimal yearlyReturn = Balance * savingsAccountRate;
-                Message.WriteLine(new Message($"Bankens sparränta: {savingsAccountRate:P}. Avkastning per år:{getCurrencyDisplayString(yearlyReturn):C}."));
+                Message.WriteLine(new Message
+                    (
+                    $"Bankens sparränta: {savingsAccountRate:P}.\n" +
+                    $"Avkastning per år:{getCurrencyDisplayString(yearlyReturn):C}."
+                    ));
             }
             else
             {
-                Message.WriteLine(new Message("Det finns inga pengar på ditt sparkonto."));
+                Message.WriteLine(new Message("Det finns inga pengar på ditt sparkonto.", MessageType.ERROR));
             }
         }
 

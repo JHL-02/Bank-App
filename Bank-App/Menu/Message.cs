@@ -20,6 +20,10 @@
             {
                 Color = ConsoleColor.Red;
             }
+            if (MsgType == MessageType.INPUT)
+            {
+                Color = ConsoleColor.Yellow;
+            }
         }
 
         public Message SetColor(ConsoleColor? color)

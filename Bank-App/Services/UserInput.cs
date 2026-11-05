@@ -28,7 +28,7 @@
 
                 if (invalidInputMessage != null)
                 {
-                    Message.WriteLine(new Message(invalidInputMessage));
+                    Message.WriteLine(new Message(invalidInputMessage, MessageType.INPUT));
                 }
             }
         }
@@ -53,7 +53,7 @@
 
                 if (invalidInputMessage != null)
                 {
-                    Message.WriteLine(new Message(invalidInputMessage));
+                    Message.WriteLine(new Message(invalidInputMessage, MessageType.INPUT));
                 }
             }
         }
@@ -117,7 +117,7 @@
                 {
                     return list[input - 1];
                 }
-                Message.WriteLine(new Message("Felaktig inmatning."));
+                Message.WriteLine(new Message("Felaktig inmatning.", MessageType.ERROR));
             }
         }
     }

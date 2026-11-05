@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace Bank_App
+﻿namespace Bank_App
 {
     internal class User
     {
@@ -60,12 +58,12 @@ namespace Bank_App
         // You always get a year interest for each loan?
         public MenuResult UserLoan()
         {
-            Message.WriteLine(new Message("Hur mycket pengar vill du låna av banken? (SEK):"));
+            Message.WriteLine(new Message("Hur mycket pengar vill du låna av banken? (SEK):", MessageType.INPUT));
             decimal loanAmount = UserInput.GetDecimal("Du behöver skriva in en siffra.");
 
             if (loanAmount <= 0m)
             {
-                Message.WriteLine(new Message("Summan är för låg."));
+                Message.WriteLine(new Message("Summan är för låg.", MessageType.ERROR));
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Continue;
             }
@@ -81,15 +79,18 @@ namespace Bank_App
 
             if (loanAmount > creditLimit || userCreditScore <= 20)
             {
-                Message.WriteLine(new Message("Ditt lån har inte blivit godkänt av banken."));
+                Message.WriteLine(new Message("Ditt lån har inte blivit godkänt av banken.", MessageType.ERROR));
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Continue;
             }
 
-            Message.WriteLine(new Message($"Din ansökan för ett belopp på {loanAmount:C} har blivit godkänd."));
-            Message.WriteLine(new Message($"Årsränta: {yearlyInterest:C}. Totalkostnad: {loanSum:C}."));
+            Message.WriteLine(new Message
+                (
+                $"Din ansökan för ett belopp på {loanAmount:C} har blivit godkänd." +
+                $"\nÅrsränta: {yearlyInterest:C}. Totalkostnad: {loanSum:C}."
+                ));
 
-            Message.WriteLine(new Message("Vilket konto vill du att pengarna ska överföras till?"));
+            Message.WriteLine(new Message("Vilket konto vill du att pengarna ska överföras till?", MessageType.INPUT));
             BankAccount? bankAccount = UserSelectAccount();
 
             if (bankAccount == null)
@@ -118,22 +119,22 @@ namespace Bank_App
                 return MenuResult.Continue;
             }
 
-            Message.WriteLine(new Message("Vilket konto vill du betala med?"));
+            Message.WriteLine(new Message("Vilket konto vill du betala med?", MessageType.INPUT));
             BankAccount? payingAccount = UserSelectAccount();
 
             if (payingAccount == null)
             {
-                Message.WriteLine(new Message("Du har inga konton."));
+                Message.WriteLine(new Message("Du har inga konton.", MessageType.ERROR));
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Continue;
             }
 
-            Message.WriteLine(new Message($"Hur mycket vill du betala tillbaka? ({payingAccount.displayCurrency.ToString()}):"));
+            Message.WriteLine(new Message($"Hur mycket vill du betala tillbaka? ({payingAccount.displayCurrency.ToString()}):", MessageType.INPUT));
             decimal amount = Bank.ExchangeRates.Convert(UserInput.GetDecimal("Du behöver skriva in en siffra."), payingAccount.displayCurrency, Currency.SEK);
 
             if (amount <= 0m)
             {
-                Message.WriteLine(new Message("Summan är för låg."));
+                Message.WriteLine(new Message("Summan är för låg.", MessageType.ERROR));
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Continue;
             }
@@ -143,13 +144,13 @@ namespace Bank_App
 
             if (payingAccount.GetBalance() < userPays)
             {
-                Message.WriteLine(new Message("För lågt saldo på konto."));
+                Message.WriteLine(new Message("För lågt saldo på konto.", MessageType.ERROR));
                 return MenuResult.Continue;
             }
 
             if (!payingAccount.Withdraw(userPays))
             {
-                Message.WriteLine(new Message("FEL: Det gick inte att ta pengar ur kontot."));
+                Message.WriteLine(new Message("FEL: Det gick inte att ta pengar ur kontot.", MessageType.ERROR));
                 return MenuResult.Continue;
             }
 
@@ -183,12 +184,12 @@ namespace Bank_App
                 {
                     break;
                 }
-                Message.WriteLine(new Message("Välj ett alternativ ur listan."));
+                Message.WriteLine(new Message("Välj ett alternativ ur listan.", MessageType.INPUT));
             }
             bool isSavingsAccount = accountTypeInput == 2;
 
 
-            Message.WriteLine(new Message($"Ange ett namn för det nya kontot (max {BankAccount.MaxNameLength} tecken, inga mellanslag):"));
+            Message.WriteLine(new Message($"Ange ett namn för det nya kontot (max {BankAccount.MaxNameLength} tecken, inga mellanslag):", MessageType.INPUT));
             string input;
             string proposedName;
             while (true)
@@ -197,7 +198,7 @@ namespace Bank_App
 
                 if (input.Any(char.IsWhiteSpace))
                 {
-                    Message.WriteLine(new Message("Kontonamnet får inte innehålla mellanslag."));
+                    Message.WriteLine(new Message("Kontonamnet får inte innehålla mellanslag.", MessageType.ERROR));
                     continue;
                 }
 
@@ -209,10 +210,10 @@ namespace Bank_App
                     break;
                 }
 
-                Message.WriteLine(new Message($"Ditt namn är längre än {BankAccount.MaxNameLength} tecken."));
+                Message.WriteLine(new Message($"Ditt namn kan inte vara längre än {BankAccount.MaxNameLength} tecken.", MessageType.ERROR));
             }
 
-            Message.WriteLine(new Message($"Är du säker på kontonamnet \"{proposedName}\"?"));
+            Message.WriteLine(new Message($"Är du säker på kontonamnet \"{proposedName}\"?", MessageType.INPUT));
 
             if (!UserInput.GetYesOrNo())
             {
@@ -227,7 +228,7 @@ namespace Bank_App
                 UserInput.WaitForUserConfirm();
                 return MenuResult.Rebuild;
             }
-            Message.WriteLine(new Message("Ditt konto kunde inte skapas då namnet redan används."));
+            Message.WriteLine(new Message("Ditt konto kunde inte skapas då namnet redan används.", MessageType.ERROR));
             UserInput.WaitForUserConfirm();
             return MenuResult.Continue;
         }
@@ -242,15 +243,12 @@ namespace Bank_App
 
                 if (this is Admin admin)
                 {
-                    Message.WriteLine(new Message("Vill du logga in som admin?"));
+                    Message.WriteLine(new Message("Vill du logga in som admin?", MessageType.INPUT));
                     if (UserInput.GetYesOrNo())
                     {
-                        Message.WriteLine(new Message("Loggar in som admin."));
                         admin.DisplayAdminMenu();
                         return MenuResult.Continue;
                     }
-
-                    Message.WriteLine(new Message("Loggar in som användare."));
                 }
 
                 do
@@ -341,10 +339,10 @@ namespace Bank_App
 
         private MenuResult StartUserTransaction(BankAccount account)
         {
-            Message.WriteLine(new Message("Vill du föra över til dig själv?"));
+            Message.WriteLine(new Message("Vill du föra över til dig själv?", MessageType.INPUT));
             if (UserInput.GetYesOrNo())
             {
-                Message.WriteLine(new Message("Vilket konto vill du föra över till?"));
+                Message.WriteLine(new Message("Vilket konto vill du föra över till?", MessageType.INPUT));
                 BankAccount? targetedAccount = UserSelectAccount();
 
                 if (targetedAccount != null && targetedAccount != account)
@@ -356,31 +354,31 @@ namespace Bank_App
                 }
                 else if (targetedAccount == account)
                 {
-                    Message.WriteLine(new Message("Du kan inte föra över till samma konto"));
+                    Message.WriteLine(new Message("Du kan inte föra över till samma konto", MessageType.ERROR));
                     UserInput.WaitForUserConfirm();
                 }
                 else
                 {
-                    Message.WriteLine(new Message($"Inget konto hittades."));
+                    Message.WriteLine(new Message($"Inget konto hittades.", MessageType.ERROR));
                     UserInput.WaitForUserConfirm();
                 }
             }
             else
             {
-                Message.WriteLine(new Message("Vilken användare vill du föra över till?"));
+                Message.WriteLine(new Message("Vilken användare vill du föra över till?", MessageType.INPUT));
                 string input = UserInput.GetString();
 
                 User? targetedUser = Bank.UserDatabase.GetUserWithUsername(input);
                 if (targetedUser != null)
                 {
-                    Message.WriteLine(new Message("Ange namnet på kontot som du vill föra över till:"));
+                    Message.WriteLine(new Message("Ange namnet på kontot som du vill föra över till:", MessageType.INPUT));
                     string userAccountTargetString = UserInput.GetString("Felaktig inmatning.");
 
                     BankAccount? targetedAccount = targetedUser.GetAccountWithName(userAccountTargetString);
 
                     if (targetedAccount != null)
                     {
-                        Message.WriteLine(new Message($"Hur mycket vill du föra över? ({account.displayCurrency.ToString()}):"));
+                        Message.WriteLine(new Message($"Hur mycket vill du föra över? ({account.displayCurrency.ToString()}):", MessageType.INPUT));
                         decimal transferAmount = Bank.ExchangeRates.Convert(UserInput.GetDecimal("Du behöver skriva in en siffra."), account.displayCurrency, Currency.SEK);
 
                         if (account.Transactions(targetedAccount, transferAmount))
@@ -389,19 +387,19 @@ namespace Bank_App
                         }
                         else
                         {
-                            Message.WriteLine(new Message("Det gick inte att föra över."));
+                            Message.WriteLine(new Message("Det gick inte att föra över.", MessageType.ERROR));
                         }
                         UserInput.WaitForUserConfirm();
                     }
                     else
                     {
-                        Message.WriteLine(new Message($"Kunde inte hitta något konto med namnet {userAccountTargetString}"));
+                        Message.WriteLine(new Message($"Kunde inte hitta något konto med namnet {userAccountTargetString}", MessageType.ERROR));
                         UserInput.WaitForUserConfirm();
                     }
                 }
                 else
                 {
-                    Message.WriteLine(new Message($"Kunde inte hitta en användare med namnet {input}."));
+                    Message.WriteLine(new Message($"Kunde inte hitta en användare med namnet {input}.", MessageType.ERROR));
                     UserInput.WaitForUserConfirm();
                 }
             }

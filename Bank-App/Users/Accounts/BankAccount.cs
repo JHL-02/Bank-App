@@ -58,19 +58,19 @@ namespace Bank_App
         {
             if (targetedAccount == this)
             {
-                Message.WriteLine(new Message("Du kan inte överföra till samma konto."));
+                Message.WriteLine(new Message("Du kan inte överföra till samma konto.", MessageType.ERROR));
                 return false;
             }
 
             if (transferAmount <= 0)
             {
-                Message.WriteLine(new Message("Du kan inte överföra 0 eller mindre pengar."));
+                Message.WriteLine(new Message("Du kan inte överföra 0 eller mindre pengar.", MessageType.ERROR));
                 return false;
             }
 
             if (transferAmount > Balance || Balance <= 0)
             {
-                Message.WriteLine(new Message("För litet saldo"));
+                Message.WriteLine(new Message("För litet saldo", MessageType.ERROR));
                 return false;
             }
             else
