@@ -111,8 +111,16 @@ namespace Bank_App
                 var transaction = PendingTransactionsList.Pop();
 
                 Deposit(transaction.Amount);
+                if (transaction.IsSender)
+                {
+                    TransactionsHistory.Add($"{transaction.AccountName} tog emot {transaction.Amount}kr från dig {DateTime.Now}");
+                }
+                else
+                {
+                    TransactionsHistory.Add($"{transaction.AccountName} skickade {transaction.Amount}kr till dig {DateTime.Now}");
+                }
                 
-                TransactionsHistory.Add($"{transaction.AccountName} skickade {transaction.Amount}kr till dig {DateTime.Now}");
+                
                 
             }
             //accountOwner.MarkTransactionsUpdated();
