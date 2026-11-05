@@ -126,11 +126,11 @@
                 return MenuResult.Continue;
             }
 
-            Message.WriteLine(new Message("Hur mycket saldo ska läggas till?:", MessageType.INPUT));
+            Message.WriteLine(new Message($"Hur mycket saldo ska läggas till? ({targetedAccount.displayCurrency}):", MessageType.INPUT));
             decimal addAmmount = UserInput.GetDecimal();
 
             targetedAccount.Deposit(addAmmount);
-            Message.WriteLine(new Message($"{addAmmount} saldo har tilldelats till \"{targetedAccount.Name}\""));
+            Message.WriteLine(new Message($"{targetedAccount.getCurrencyDisplayString(addAmmount)} har tilldelats till \"{targetedAccount.Name}\""));
             UserInput.WaitForUserConfirm();
 
             return MenuResult.Continue;
