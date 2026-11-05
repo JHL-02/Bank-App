@@ -3,7 +3,7 @@
     internal class SavingsAccount : BankAccount
     {
         // Sparkonto
-        public SavingsAccount(User owner, string name) : base(owner, name)
+        public SavingsAccount(User owner, string name, Currency currency = Currency.SEK) : base(owner, name)//currency skickas vidare till BankAccount. Annars blir ett sparkonto alltid SEK.
         {
             AccountType = "Sparkonto";
         }

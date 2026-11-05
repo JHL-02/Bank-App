@@ -18,7 +18,7 @@ namespace Bank_App
         public Stack<(string AccountName, decimal Amount, DateTime TransactionTime, bool IsSender)> PendingTransactionsList = new();
 
 
-        public BankAccount(User owner, string name)
+        public BankAccount(User owner, string name, Currency currency = Currency.SEK)
         {
             AccountType = "Privatkonto";
             accountOwner = owner;
@@ -29,7 +29,8 @@ namespace Bank_App
             }
 
             Name = newName;
-            Balance = 500.0m;
+            displayCurrency = currency;
+            Balance = Bank.ExchangeRates.Convert(500.0m, Currency.SEK, currency); //500 SEK räknas om till kontots valuta. USD-konto börjar med cirka 47,62 dollar, inte 500 dollar.
         }
 
         public decimal GetBalance()
@@ -75,10 +76,16 @@ namespace Bank_App
             }
             else
             {
-                
+                decimal receivedAmount = Bank.ExchangeRates.Convert(transferAmount, displayCurrency, targetedAccount.displayCurrency);
+                if (receivedAmount <= 0m)
+                {
+                    Console.WriteLine("Summan är för liten för att växlas.");
+                    return false;
+                }
+
                 DateTime transferedTime = DateTime.Now.AddMinutes(15);
                 Withdraw(transferAmount);
-                targetedAccount.AddPendingTransaction(Name,transferAmount, transferedTime, false);
+                targetedAccount.AddPendingTransaction(Name,receivedAmount, transferedTime, false); //false = mottagaren får den växlade summan.
                 AddPendingTransaction(targetedAccount.Name, transferAmount, transferedTime, true);
                 
                 return true;
@@ -93,11 +100,8 @@ namespace Bank_App
             PendingTransactionsList.Push((accountName, transferAmount, transferedTime, isSender));
         }
 
-       
-        public void setDisplayCurrency(Currency newCurrency)
-        {
-            displayCurrency = newCurrency;
-        }
+        //setDisplayCurrency är borttagen.
+        // Valutan ska inte gå att byta efter att kontot har skapats.
 
         public void ExecuteTransactions()
         {
@@ -109,39 +113,39 @@ namespace Bank_App
             while (PendingTransactionsList.Count > 0)
             {
                 var transaction = PendingTransactionsList.Pop();
+                //Avsändarens rad ska inte sättas in på kontot igen.
+                // Pengarna drogs redan i Transactions.
+                if (transaction.IsSender)
+                {
+                    TransactionsHistory.Add($"{Name} skickade {getCurrencyDisplayString(transaction.Amount)} till {transaction.AccountName} {DateTime.Now}");
+                    continue;
+                }
 
                 Deposit(transaction.Amount);
                 
-                TransactionsHistory.Add($"{transaction.AccountName} skickade {transaction.Amount}kr till dig {DateTime.Now}");
-                
+                TransactionsHistory.Add($"{transaction.AccountName} skickade {getCurrencyDisplayString(transaction.Amount)} till dig {DateTime.Now}"); //Summan är redan i det här kontots valuta. Skriv inte kr på allt.
+
+
             }
             //accountOwner.MarkTransactionsUpdated();
         }
 
         public string getCurrencyDisplayString(decimal number)
         {
-            string currencyUnit;
-            bool placeUnitBefore = false;
+            string  formatted = number.ToString("F2");
             switch (displayCurrency)
             {
                 case Currency.SEK:
-                    currencyUnit = "kr";
-                    break;
+                    return $"{formatted} kr";
                 case Currency.USD:
-                    currencyUnit = "$";
-                    placeUnitBefore = true;
-                    break;
+                    return $"${formatted}";
                 case Currency.EUR:
-                    currencyUnit = "€";
-                    placeUnitBefore = true;
-                    break;
+                    return $"€{formatted}";
                 default:
-                    currencyUnit = "";
-                    break;
+                    return formatted;
             }
-            string convertedBalance = Bank.ExchangeRates.Convert(number, Currency.SEK, displayCurrency).ToString("F2");
-
-            return placeUnitBefore ? $"{currencyUnit}{convertedBalance}" : $"{convertedBalance}{currencyUnit}";
+            //Talet är redan i kontots valuta.
+            // Vi växlar inte en gång till, för då blir summan fel.
         }
     }
 }

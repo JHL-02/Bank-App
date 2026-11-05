@@ -31,8 +31,8 @@ namespace Bank_App
             userLoanDebt = 0.0m;
             //userCreditScore = Bank.DefaultUserCreditScore;
         }
-
-        private bool AddAccount(string name, bool isSavingsAccount = false)
+        //currency är ny.Den skickas till det nya kontot.
+        private bool AddAccount(string name, Currency currency, bool isSavingsAccount = false)
         {
             if (_accounts.Any(a => string.Equals(a.Name, name, StringComparison.OrdinalIgnoreCase) || name.Length > BankAccount.MaxNameLength || _accounts.Count >= BankAccount.MaxAccountAmount))
             {
@@ -40,13 +40,14 @@ namespace Bank_App
             }
             if (isSavingsAccount)
             {
-                _accounts.Add(new SavingsAccount(this, name));
+                _accounts.Add(new SavingsAccount(this, name, currency));
                 return true;
             }
-            _accounts.Add(new BankAccount(this, name));
+            _accounts.Add(new BankAccount(this, name, currency));
             return true;
         }
-        public decimal GetTotalBalance() => _accounts.Sum(account => account.GetBalance());
+        //Lån räknas i SEK.Varje saldo räknas om till SEK först.
+        public decimal GetTotalBalance() => _accounts.Sum(account => Bank.ExchangeRates.Convert(account.GetBalance(), account.displayCurrency, Currency.SEK));
 
         public decimal CalculateCreditRate()
         {
@@ -99,7 +100,8 @@ namespace Bank_App
                 return MenuResult.Continue;
             }
 
-            bankAccount.Deposit(loanAmount);
+            bankAccount.Deposit(Bank.ExchangeRates.Convert(loanAmount, Currency.SEK, bankAccount.displayCurrency)); // lånet är i SEK, sätts in i kontots valuta
+
             if (bankAccount.displayCurrency != Currency.SEK)
             {
                 Console.WriteLine("Konverterar valuta.");
@@ -129,7 +131,8 @@ namespace Bank_App
             }
 
             Console.WriteLine($"Hur mycket vill du betala tillbaka? ({payingAccount.displayCurrency.ToString()}):");
-            decimal amount = Bank.ExchangeRates.Convert(UserInput.GetDecimal("Du behöver skriva in en siffra."), payingAccount.displayCurrency, Currency.SEK);
+            decimal typedAmount = UserInput.GetDecimal("Du behöver skriva in en siffra."); // det användaren skrev, i kontots valuta
+            decimal amount = typedAmount > 0m ? Bank.ExchangeRates.Convert(typedAmount, payingAccount.displayCurrency, Currency.SEK) : 0m; //negativt tal blir 0 (Convert kastar fel på negativt)
 
             if (amount <= 0m)
             {
@@ -140,14 +143,15 @@ namespace Bank_App
 
             decimal newAmount = userLoanDebt - amount;
             decimal userPays = Math.Min(amount, userLoanDebt);
+            decimal payInAccountCurrency = Bank.ExchangeRates.Convert(userPays, Currency.SEK, payingAccount.displayCurrency);
 
-            if (payingAccount.GetBalance() < userPays)
+            if (payingAccount.GetBalance() < payInAccountCurrency)
             {
                 Console.WriteLine("För lågt saldo på konto.");
                 return MenuResult.Continue;
             }
 
-            if (!payingAccount.Withdraw(userPays))
+            if (!payingAccount.Withdraw(payInAccountCurrency))
             {
                 Console.WriteLine("FEL: Det gick inte att ta pengar ur kontot.");
                 return MenuResult.Continue;
@@ -155,7 +159,7 @@ namespace Bank_App
 
             userLoanDebt -= userPays;
 
-            Console.WriteLine($"Du har betalat tillbaka {payingAccount.getCurrencyDisplayString(userPays)} till banken.");
+            Console.WriteLine($"Du har betalat tillbaka {payingAccount.getCurrencyDisplayString(payInAccountCurrency)} till banken.");
             UserInput.WaitForUserConfirm();
             return MenuResult.Continue;
         }
@@ -187,6 +191,10 @@ namespace Bank_App
             }
             bool isSavingsAccount = accountTypeInput == 2;
 
+            //Valutan väljs här och kan inte ändras efteråt.
+            Console.WriteLine("Vilken valuta ska kontot ha?");
+            Currency? chosenCurrency = UserInput.UserGetObjectFromList(Enum.GetValues<Currency>().ToList(), c => c.ToString());
+            Currency accountCurrency = chosenCurrency ?? Currency.SEK;
 
             Console.WriteLine($"Ange ett namn för det nya kontot (max {BankAccount.MaxNameLength} tecken, inga mellanslag):");
             string input;
@@ -221,7 +229,7 @@ namespace Bank_App
             }
 
 
-            if (AddAccount(proposedName, isSavingsAccount))
+            if (AddAccount(proposedName, accountCurrency, isSavingsAccount)) // Valutan skickas med när kontot skapas.
             {
                 Console.WriteLine("Ditt konto har skapats.");
                 UserInput.WaitForUserConfirm();
@@ -314,22 +322,14 @@ namespace Bank_App
                 }),
                 new MenuOption("Överföra pengar", () => StartUserTransaction(account)),
                 new MenuOption("Transaktions historik", () => TransactionHistory(account)),
-                new MenuOption("Ändra valuta", () => UserChangeAccountCurrency(account))
+                //Valutan väljs när kontot skapas.
             }, account.Name);
             accountMenu.Display();
 
             return MenuResult.Continue;
         }
 
-        private MenuResult UserChangeAccountCurrency(BankAccount account)
-        {
-            Currency? chosenCurrency = UserInput.UserGetObjectFromList(Enum.GetValues<Currency>().ToList<Currency>(), type => type.ToString());
-            if (chosenCurrency.HasValue)
-            {
-                account.setDisplayCurrency(chosenCurrency.Value);
-            }
-            return MenuResult.Continue;
-        }
+        // Jag ta bort UserChangeAccountCurrency method. setDisplayCurrency finns inte längre.
 
         //Allows other classes to see the password for validation
         public bool CheckPassword(string password)
@@ -348,7 +348,7 @@ namespace Bank_App
                 if (targetedAccount != null && targetedAccount != account)
                 {
                     Console.WriteLine($"Hur mycket vill du föra över?: ({account.displayCurrency.ToString()})");
-                    decimal transferAmount = Bank.ExchangeRates.Convert(UserInput.GetDecimal("Du behöver skriva in en siffra."), account.displayCurrency, Currency.SEK);
+                    decimal transferAmount = UserInput.GetDecimal("Du behöver skriva in en siffra."); //Ingen växling till SEK här. Växlingen sker i Transactions.
 
                     account.Transactions(targetedAccount, transferAmount);
                 }
@@ -379,7 +379,7 @@ namespace Bank_App
                     if (targetedAccount != null)
                     {
                         Console.WriteLine($"Hur mycket vill du föra över? ({account.displayCurrency.ToString()}):");
-                        decimal transferAmount = Bank.ExchangeRates.Convert(UserInput.GetDecimal("Du behöver skriva in en siffra."), account.displayCurrency, Currency.SEK);
+                        decimal transferAmount =UserInput.GetDecimal("Du behöver skriva in en siffra."); //Samma sak här. Ingen växling till SEK före Transactions.
 
                         if (account.Transactions(targetedAccount, transferAmount))
                         {

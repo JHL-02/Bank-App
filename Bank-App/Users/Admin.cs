@@ -123,11 +123,11 @@
                 return MenuResult.Continue;
             }
 
-            Console.WriteLine("Hur mycket saldo ska läggas till?:");
+            Console.WriteLine($"Hur mycket saldo ska läggas till? ({targetedAccount.displayCurrency}):"); //Beloppet skrivs i kontots egen valuta.
             decimal addAmmount = UserInput.GetDecimal();
 
             targetedAccount.Deposit(addAmmount);
-            Console.WriteLine($"{addAmmount} saldo har tilldelats till \"{targetedAccount.Name}\"");
+            Console.WriteLine($"{targetedAccount.getCurrencyDisplayString(addAmmount)} har tilldelats till \"{targetedAccount.Name}\""); //Visa summan med kontots valuta, inte bara siffran
             UserInput.WaitForUserConfirm();
 
             return MenuResult.Continue;
