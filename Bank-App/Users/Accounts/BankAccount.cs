@@ -120,11 +120,11 @@ namespace Bank_App
                 
                 if (transaction.IsSender)
                 {
-                    TransactionsHistory.Add($"{transaction.AccountName} tog emot {transaction.Amount}kr från dig {DateTime.Now}");
+                    TransactionsHistory.Add($"{transaction.AccountName} tog emot {getCurrencyDisplayString(transaction.Amount)} från dig {DateTime.Now}");
                 }
                 else
                 {
-                    TransactionsHistory.Add($"{transaction.AccountName} skickade {transaction.Amount}kr till dig {DateTime.Now}");
+                    TransactionsHistory.Add($"{transaction.AccountName} skickade {getCurrencyDisplayString(transaction.Amount)}kr till dig {DateTime.Now}");
                 }
                 
                 

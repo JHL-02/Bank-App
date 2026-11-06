@@ -433,7 +433,7 @@ namespace Bank_App
                     }
                     else
                     {
-                        sb.Append($"{account.getCurrencyDisplayString(pending.Amount)} skickas till {pending.AccountName} kl {pending.TransactionTime:HH:mm:ss}");
+                        sb.Append($"{account.getCurrencyDisplayString(pending.Amount)} tas emot från {pending.AccountName} kl {pending.TransactionTime:HH:mm:ss}");
                     }
                 }
                 Message.WriteLine(new Message(sb.ToString()));
