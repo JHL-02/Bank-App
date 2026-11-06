@@ -345,11 +345,12 @@ namespace Bank_App
             if (UserInput.GetYesOrNo())
             {
                 Message.WriteLine(new Message("Vilket konto vill du föra över till?", MessageType.INPUT));
+                Console.WriteLine();
                 BankAccount? targetedAccount = UserSelectAccount();
 
                 if (targetedAccount != null && targetedAccount != account)
                 {
-                    Message.WriteLine(new Message($"Hur mycket vill du föra över?: ({account.displayCurrency.ToString()})"));
+                    Message.WriteLine(new Message($"Hur mycket vill du föra över?: ({account.displayCurrency.ToString()})", MessageType.INPUT));
                     decimal transferAmount = UserInput.GetDecimal("Du behöver skriva in en siffra.");
 
                     account.Transactions(targetedAccount, transferAmount);
