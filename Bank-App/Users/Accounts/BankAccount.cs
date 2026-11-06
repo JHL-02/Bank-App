@@ -84,7 +84,7 @@ namespace Bank_App
                 }
 
                 // The money is reserved immediately, but the recipient receives it after 15 minutes.
-                DateTime transferedTime = DateTime.Now.AddMinutes(15);
+                DateTime transferedTime = TimerService.NextUpdate();
                 Withdraw(transferAmount);
                 targetedAccount.AddPendingTransaction(Name,receivedAmount, transferedTime, false); // false means the recipient receives the converted amount.
                 AddPendingTransaction(targetedAccount.Name, transferAmount, transferedTime, true);
@@ -121,11 +121,11 @@ namespace Bank_App
                 
                 if (transaction.IsSender)
                 {
-                    TransactionsHistory.Add($"{transaction.AccountName} tog emot {getCurrencyDisplayString(transaction.Amount)} från dig {DateTime.Now}");
+                    TransactionsHistory.Add($"{transaction.AccountName} tog emot {getCurrencyDisplayString(transaction.Amount)} från dig {DateTime.Now:HH:mm}");
                 }
                 else
                 {
-                    TransactionsHistory.Add($"{transaction.AccountName} skickade {getCurrencyDisplayString(transaction.Amount)}kr till dig {DateTime.Now}");
+                    TransactionsHistory.Add($"{transaction.AccountName} skickade {getCurrencyDisplayString(transaction.Amount)}kr till dig {DateTime.Now:HH:mm}");
                 }
                 
                 

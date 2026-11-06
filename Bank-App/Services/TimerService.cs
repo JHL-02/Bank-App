@@ -4,6 +4,35 @@
     internal class TimerService
     {
         public static event Action? OnTimerTick;
+        public static DateTime NextUpdate()
+        {
+            DateTime now = DateTime.Now;
+
+            int nextQuarter = ((now.Minute / 15) + 1) * 15;
+
+            return new DateTime(
+                now.Year,
+                now.Month,
+                now.Day,
+                now.Hour,
+                0,
+                0
+            ).AddMinutes(nextQuarter);
+        }
+
+        public static async Task TransactionsTimer(Action transactionMethod)
+        {
+            while (true)
+            {
+                DateTime nextUpdate = NextUpdate();
+
+                TimeSpan delay = nextUpdate - DateTime.Now;
+                await Task.Delay(delay);
+                transactionMethod();
+
+                OnTimerTick?.Invoke();
+            }
+        }
 
         public static async Task TransactionsTimer(Action transactionMethod)
         {
