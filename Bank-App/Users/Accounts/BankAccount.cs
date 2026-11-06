@@ -125,7 +125,7 @@ namespace Bank_App
                 }
                 else
                 {
-                    TransactionsHistory.Add($"{transaction.AccountName} skickade {getCurrencyDisplayString(transaction.Amount)}kr till dig {DateTime.Now:HH:mm}");
+                    TransactionsHistory.Add($"{transaction.AccountName} skickade {getCurrencyDisplayString(transaction.Amount)} till dig {DateTime.Now:HH:mm}");
                 }
                 
                 

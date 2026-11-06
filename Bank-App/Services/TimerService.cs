@@ -34,16 +34,7 @@
             }
         }
 
-        public static async Task TransactionsTimer(Action transactionMethod)
-        {
-            while (true)
-            {
-                await Task.Delay(TimeSpan.FromSeconds(60));
-                transactionMethod();
-
-                OnTimerTick?.Invoke();
-            }
-        }
+        
 
         public static async Task ShowNotification(string message)
         {
