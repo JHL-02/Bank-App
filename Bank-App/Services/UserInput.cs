@@ -1,4 +1,6 @@
-﻿namespace Bank_App
+﻿using System.Text;
+
+namespace Bank_App
 {
     internal static class UserInput
     {
@@ -9,6 +11,8 @@
             Console.ForegroundColor = ConsoleColor.Yellow;
 
             string? input = Console.ReadLine();
+
+            Console.WriteLine();
 
             Console.ForegroundColor = oldColor;
 
@@ -104,6 +108,7 @@
                 return default;
             }
 
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < list.Count; i++)
             {
                 Message.WriteLine(new Message($"{i + 1}. {getName(list[i])}"));
