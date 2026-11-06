@@ -162,7 +162,7 @@ namespace Bank_App
 
             userLoanDebt -= userPays;
 
-            Message.WriteLine(new Message($"Du har betalat tillbaka {payingAccount.getCurrencyDisplayString(userPays)} till banken."));
+            Message.WriteLine(new Message($"Du har betalat tillbaka {payingAccount.getCurrencyDisplayString(payInAccountCurrency)} till banken."));
             UserInput.WaitForUserConfirm();
             return MenuResult.Continue;
         }
@@ -350,7 +350,7 @@ namespace Bank_App
                 if (targetedAccount != null && targetedAccount != account)
                 {
                     Message.WriteLine(new Message($"Hur mycket vill du föra över?: ({account.displayCurrency.ToString()})"));
-                    decimal transferAmount = Bank.ExchangeRates.Convert(UserInput.GetDecimal("Du behöver skriva in en siffra."), account.displayCurrency, Currency.SEK);
+                    decimal transferAmount = UserInput.GetDecimal("Du behöver skriva in en siffra.");
 
                     account.Transactions(targetedAccount, transferAmount);
                 }
@@ -381,7 +381,7 @@ namespace Bank_App
                     if (targetedAccount != null)
                     {
                         Message.WriteLine(new Message($"Hur mycket vill du föra över? ({account.displayCurrency.ToString()}):", MessageType.INPUT));
-                        decimal transferAmount = Bank.ExchangeRates.Convert(UserInput.GetDecimal("Du behöver skriva in en siffra."), account.displayCurrency, Currency.SEK);
+                        decimal transferAmount = UserInput.GetDecimal("Du behöver skriva in en siffra.");
 
                         if (account.Transactions(targetedAccount, transferAmount))
                         {
