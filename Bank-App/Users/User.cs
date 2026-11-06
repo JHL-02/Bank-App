@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Bank_App.Users;
+using System.Text;
 
 namespace Bank_App
 {
@@ -7,6 +8,7 @@ namespace Bank_App
     {
         public string Username { get; init; }
         private string Password { get; init; }
+        public PersonalDetails Details { get; protected set; }
         private readonly List<BankAccount> _accounts = new List<BankAccount>();
         public IReadOnlyCollection<BankAccount> Accounts => _accounts.AsReadOnly();
         public decimal userLoanDebt { get; protected set; }
@@ -28,6 +30,7 @@ namespace Bank_App
 
         public User(string username, string password)
         {
+            Details = new PersonalDetails();
             Username = username;
             Password = password;
             userLoanDebt = 0.0m;
@@ -273,6 +276,7 @@ namespace Bank_App
                     menuOptions.Add(new MenuOption("Lägg till nytt konto.", () => UserCreateAccount()));
 
                     menuOptions.Add(new MenuOption("Visa användaruppgifter.", () => DisplayUserInfo()));
+                    menuOptions.Add(new MenuOption("Uppdatera användaruppgifter.", () => DisplayUpdateUserInfoMenu()));
 
                     menuOptions.Add(new MenuOption("Låna pengar av banken.", UserLoan));
                     menuOptions.Add(new MenuOption("Betala pengar tillbaka till banken.", PayBackUserLoan));
@@ -296,12 +300,84 @@ namespace Bank_App
             }
         }
 
+        private MenuResult DisplayUpdateUserInfoMenu()
+        {
+            Menu updateInfoMenu = new Menu(new List<MenuOption>
+            {
+                new MenuOption("Uppdatera Namn.", () => UpdateUserDetails(UserDetailsUpdateType.Name)),
+                new MenuOption("Uppdatera Telefonnummer.", () => UpdateUserDetails(UserDetailsUpdateType.Phone)),
+                new MenuOption("Uppdatera Email.", () => UpdateUserDetails(UserDetailsUpdateType.Email))
+            }, "Uppdatera Användaruppgifter");
+            updateInfoMenu.Display();
+            return MenuResult.Continue;
+        }
+        protected enum UserDetailsUpdateType
+        {
+            Email,
+            Phone,
+            Name
+        }
+        private MenuResult UpdateUserDetails(UserDetailsUpdateType type)
+        {
+            string old;
+            string feild;
+            Action<string>? updateMethod;
+            switch (type)
+            {
+                case UserDetailsUpdateType.Email :
+                    updateMethod = Details.SetEmail;
+                    old = Details.Email;
+                    feild = "Email";
+                    break;
+                case UserDetailsUpdateType.Phone :
+                    updateMethod = Details.SetPhone;
+                    old = Details.Phone;
+                    feild = "Telefonnummer";
+                    break;
+                case UserDetailsUpdateType.Name :
+                    updateMethod = Details.SetName;
+                    old = Details.Name;
+                    feild = "Namn";
+                    break;
+                default :
+                    updateMethod = null;
+                    old = "N/A";
+                    feild = "N/A";
+                    break;
+            }
+            if (updateMethod == null)
+            {
+                Message.WriteLine(new Message("Det blev ett fel med ändringen.", MessageType.ERROR));
+                return MenuResult.Continue;
+            }
+
+            Message.WriteLine(new Message($"Ange nytt {feild}:", MessageType.INPUT));
+            string input = UserInput.GetString();
+
+            Message.WriteLine(new Message
+                (
+                $"{input}\n" +
+                $"Är det här korrekt?:", MessageType.INPUT
+                ));
+            if (!UserInput.GetYesOrNo())
+            {
+                return MenuResult.Continue;
+            }
+
+            updateMethod(input);
+
+            Message.WriteLine(new Message($"{feild} har uppdaterats från {old} till {input}"));
+            UserInput.WaitForUserConfirm();
+
+            return MenuResult.Continue;
+        }
+
         private MenuResult DisplayUserInfo()
         {
             Message.WriteLine(new Message(
-                $"Namn: N/A" +
-                $"\nEmail: N/A" +
-                $"\nTelefon: N/A" +
+                $"Namn: {Details.Name}" +
+                $"\nEmail: {Details.Email}" +
+                $"\nTelefonnummer: {Details.Phone}" +
                 $"\nDu är skyldig att betala tillbaka {userLoanDebt} till banken." +
                 $"\nDin kreditvärdighet är {userCreditScore}"
                 ));
