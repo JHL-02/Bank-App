@@ -111,8 +111,12 @@ namespace Bank_App
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < list.Count; i++)
             {
-                Message.WriteLine(new Message($"{i + 1}. {getName(list[i])}"));
+                if (sb.Length > 0)
+                    sb.AppendLine();
+
+                sb.Append($"{i + 1}. {getName(list[i])}");
             }
+            Message.WriteLine(new Message(sb.ToString()));
 
             int input = 0;
             while (true)
