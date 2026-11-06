@@ -1,5 +1,6 @@
 ﻿namespace Bank_App
 {
+    // Stores exchange rates and converts amounts between supported currencies.
     internal class ExchangeRates
     {
         // SEK is the base. Then we only store "how many SEK is 1 USD"

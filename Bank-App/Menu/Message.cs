@@ -1,11 +1,13 @@
 ﻿namespace Bank_App
 {
+    // Identifies the purpose and default presentation of a message.
     enum MessageType
     {
         STANDARD,
         ERROR,
         INPUT
     }
+    // Formats and displays bordered console messages with optional colors.
     internal class Message
     {
         public string Text { get; init; }

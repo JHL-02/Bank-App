@@ -2,6 +2,7 @@
 
 namespace Bank_App
 {
+    // Reads and validates the different types of input used by the application.
     internal static class UserInput
     {
         public static string? ReadLine()
@@ -122,6 +123,7 @@ namespace Bank_App
             while (true)
             {
                 input = GetInt();
+                // List indexes start at 0, while users select items starting at 1.
                 if (input >= 1 && input <= list.Count)
                 {
                     return list[input - 1];

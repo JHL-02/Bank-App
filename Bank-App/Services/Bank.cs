@@ -1,13 +1,14 @@
 ﻿namespace Bank_App
 {
+    // Coordinates shared banking data, startup, users, rates, and transactions.
     internal static class Bank
     {
         public static UserDatabase UserDatabase { get; } = new UserDatabase();
         public static ExchangeRates ExchangeRates { get; } = new ExchangeRates();
 
         //public const int DefaultUserCreditScore = 100; I don't know what to do with this system -William
-        public static decimal loanExtraCreditRate { get; private set; } = 0.05m; // Högre räntevärde för en lägre kreditvärdighet.
-        public static decimal loanCreditRate { get; private set; } = 0.03m; // Standard lånränta på lånet. 3%
+        public static decimal loanExtraCreditRate { get; private set; } = 0.05m; // Higher interest rate for a lower credit score.
+        public static decimal loanCreditRate { get; private set; } = 0.03m; // Standard loan interest rate. 3%
 
         private static Menu startMenu = new Menu(new List<MenuOption>
         {
@@ -58,6 +59,7 @@
 
         private static void ExecuteAllTransactions()
         {
+            // Each account is checked when the timer signals that pending transactions should run.
             foreach (User user in UserDatabase.Users)
             {
                 foreach (BankAccount bankAccount in user.Accounts)

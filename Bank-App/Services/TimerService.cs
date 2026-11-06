@@ -1,5 +1,6 @@
 ﻿namespace Bank_App
 {
+    // Runs periodic transaction processing and temporary console notifications.
     internal class TimerService
     {
         public static event Action? OnTimerTick;

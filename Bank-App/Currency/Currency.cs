@@ -1,7 +1,7 @@
 ﻿namespace Bank_App
 {
-    
-      public enum Currency
+    // Lists the currencies supported by the banking application.
+    public enum Currency
         {
             SEK,
             USD,

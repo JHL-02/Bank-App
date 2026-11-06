@@ -1,5 +1,6 @@
 ﻿namespace Bank_App
 {
+    // Represents one executable option in a menu.
     internal class MenuOption
     {
         public string Title { get; init; }

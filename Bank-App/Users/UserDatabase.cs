@@ -1,5 +1,6 @@
 ﻿namespace Bank_App
 {
+    // Stores users and provides user lookup and account-management operations.
     internal class UserDatabase
     {
         private readonly List<User> _users = new List<User>();

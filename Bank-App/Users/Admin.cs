@@ -1,5 +1,6 @@
 ﻿namespace Bank_App
 {
+    // Extends a user with administrative banking operations.
     internal class Admin : User
     {
         public Admin(string username, string password) : base(username, password)
@@ -30,7 +31,7 @@
             return MenuResult.Continue;
         }
 
-        // Admin skriver in dagens kurs. SEK är basen (alltid 1) och kan inte ändras.
+        // The admin enters today's rate. SEK is the base currency and cannot be changed.
         private MenuResult UpdateExchangeRate()
         {
             Bank.ExchangeRates.ShowRate();

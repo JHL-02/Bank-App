@@ -2,6 +2,7 @@
 
 namespace Bank_App
 {
+    // Represents a bank customer and manages accounts, loans, and transfers.
     internal class User
     {
         public string Username { get; init; }
@@ -16,6 +17,7 @@ namespace Bank_App
                 if (userLoanDebt == 0)
                     return 100;
 
+                // Credit score is based on capital compared with the remaining debt.
                 return Math.Clamp(
                     (int)(Math.Round((GetTotalBalance() - userLoanDebt) * 25 / userLoanDebt)),
                     0,
@@ -31,7 +33,7 @@ namespace Bank_App
             userLoanDebt = 0.0m;
             //userCreditScore = Bank.DefaultUserCreditScore;
         }
-        //currency är ny.Den skickas till det nya kontot.
+        // The selected currency is passed to the new account.
         private bool AddAccount(string name, Currency currency, bool isSavingsAccount = false)
         {
             if (_accounts.Any(a => string.Equals(a.Name, name, StringComparison.OrdinalIgnoreCase) || name.Length > BankAccount.MaxNameLength || _accounts.Count >= BankAccount.MaxAccountAmount))
@@ -46,7 +48,7 @@ namespace Bank_App
             _accounts.Add(new BankAccount(this, name, currency));
             return true;
         }
-        //Lån räknas i SEK.Varje saldo räknas om till SEK först.
+        // Loans are calculated in SEK, so every balance is converted to SEK first.
         public decimal GetTotalBalance() => _accounts.Sum(account => Bank.ExchangeRates.Convert(account.GetBalance(), account.displayCurrency, Currency.SEK));
 
         public decimal CalculateCreditRate()
@@ -72,6 +74,7 @@ namespace Bank_App
             }
 
             decimal ownCapital = GetTotalBalance() - userLoanDebt;
+            // The bank allows the user to borrow up to five times their net capital.
             decimal creditLimit = ownCapital * 5;
             if (creditLimit < 0m)
             {
@@ -103,7 +106,7 @@ namespace Bank_App
                 return MenuResult.Continue;
             }
 
-            bankAccount.Deposit(Bank.ExchangeRates.Convert(loanAmount, Currency.SEK, bankAccount.displayCurrency)); // lånet är i SEK, sätts in i kontots valuta
+            bankAccount.Deposit(Bank.ExchangeRates.Convert(loanAmount, Currency.SEK, bankAccount.displayCurrency)); // The loan is in SEK and is deposited in the account's currency.
 
             if (bankAccount.displayCurrency != Currency.SEK)
             {
@@ -134,8 +137,8 @@ namespace Bank_App
             }
 
             Message.WriteLine(new Message($"Hur mycket vill du betala tillbaka? ({payingAccount.displayCurrency.ToString()}):", MessageType.INPUT));
-            decimal typedAmount = UserInput.GetDecimal("Du behöver skriva in en siffra."); // det användaren skrev, i kontots valuta
-            decimal amount = typedAmount > 0m ? Bank.ExchangeRates.Convert(typedAmount, payingAccount.displayCurrency, Currency.SEK) : 0m; //negativt tal blir 0 (Convert kastar fel på negativt)
+            decimal typedAmount = UserInput.GetDecimal("Du behöver skriva in en siffra."); // The amount entered by the user, in the account's currency.
+            decimal amount = typedAmount > 0m ? Bank.ExchangeRates.Convert(typedAmount, payingAccount.displayCurrency, Currency.SEK) : 0m; // Negative values become 0 because Convert rejects negative amounts.
 
             if (amount <= 0m)
             {
@@ -146,6 +149,7 @@ namespace Bank_App
 
             decimal newAmount = userLoanDebt - amount;
             decimal userPays = Math.Min(amount, userLoanDebt);
+            // Repayment is calculated in SEK, but the withdrawal must use the account's currency.
             decimal payInAccountCurrency = Bank.ExchangeRates.Convert(userPays, Currency.SEK, payingAccount.displayCurrency);
 
             if (payingAccount.GetBalance() < payInAccountCurrency)
@@ -194,7 +198,7 @@ namespace Bank_App
             }
             bool isSavingsAccount = accountTypeInput == 2;
 
-            //Valutan väljs här och kan inte ändras efteråt.
+            // The currency is selected here and cannot be changed later.
             Console.WriteLine("Vilken valuta ska kontot ha?");
             Currency? chosenCurrency = UserInput.UserGetObjectFromList(Enum.GetValues<Currency>().ToList(), c => c.ToString());
             Currency accountCurrency = chosenCurrency ?? Currency.SEK;
@@ -232,7 +236,7 @@ namespace Bank_App
             }
 
 
-            if (AddAccount(proposedName, accountCurrency, isSavingsAccount)) // Valutan skickas med när kontot skapas.
+            if (AddAccount(proposedName, accountCurrency, isSavingsAccount)) // The currency is passed when the account is created.
             {
                 Message.WriteLine(new Message("Ditt konto har skapats."));
                 UserInput.WaitForUserConfirm();
@@ -263,6 +267,7 @@ namespace Bank_App
 
                 do
                 {
+                    // Rebuild the menu after creating an account so it appears immediately.
                     List<MenuOption> menuOptions = new List<MenuOption>();
 
                     menuOptions.Add(new MenuOption("Lägg till nytt konto.", () => UserCreateAccount()));
@@ -286,6 +291,7 @@ namespace Bank_App
             }
             finally
             {
+                // Prevent multiple notifications after repeated logins.
                 TimerService.OnTimerTick -= NotifyUser;
             }
         }
@@ -324,14 +330,12 @@ namespace Bank_App
                 }),
                 new MenuOption("Överföra pengar", () => StartUserTransaction(account)),
                 new MenuOption("Transaktions historik", () => TransactionHistory(account)),
-                //Valutan väljs när kontot skapas.
+                // The currency is selected when the account is created.
             }, account.Name);
             accountMenu.Display();
 
             return MenuResult.Continue;
         }
-
-        // Jag ta bort UserChangeAccountCurrency method. setDisplayCurrency finns inte längre.
 
         //Allows other classes to see the password for validation
         public bool CheckPassword(string password)
@@ -452,11 +456,6 @@ namespace Bank_App
 
         public BankAccount? UserSelectAccount() => UserInput.UserGetObjectFromList<BankAccount>(_accounts, a => a.Name);
 
-        //private int _updatedTransactions = 0;
-        //public void MarkTransactionsUpdated()
-        //{
-        //    Interlocked.Exchange(ref _updatedTransactions, 1);
-        //}
         private void NotifyUser()
         {
             _ = TimerService.ShowNotification($"Transaktioner uppdaterades.");

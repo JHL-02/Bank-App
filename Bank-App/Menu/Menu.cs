@@ -2,6 +2,7 @@
 
 namespace Bank_App
 {
+    // Displays menu options and executes the option selected by the user.
     internal class Menu
     {
         protected List<MenuOption> Options { get; } = new List<MenuOption>();

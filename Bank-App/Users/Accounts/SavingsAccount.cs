@@ -1,19 +1,21 @@
 ﻿namespace Bank_App
 {
+    // Represents a bank account that can calculate savings interest.
     internal class SavingsAccount : BankAccount
     {
-        // Sparkonto
-        public SavingsAccount(User owner, string name, Currency currency = Currency.SEK) : base(owner, name, currency)//currency skickas vidare till BankAccount. Annars blir ett sparkonto alltid SEK.
+        // Savings account.
+        public SavingsAccount(User owner, string name, Currency currency = Currency.SEK) : base(owner, name, currency)// The currency is passed to BankAccount; otherwise a savings account would always use SEK.
         {
             AccountType = "Sparkonto";
         }
-        public decimal savingsAccountRate { get; private set; } = 0.02m; // Standard sparränta för alla kunder. 2%
+        public decimal savingsAccountRate { get; private set; } = 0.02m; // Standard savings rate for all customers. 2%
 
-        // Sparränta
+        // Savings interest.
         public void ShowSavingsInterest()
         {
             if (Balance > 0)
             {
+                // Interest is calculated on the balance in the account's current currency.
                 decimal yearlyReturn = Balance * savingsAccountRate;
                 Message.WriteLine(new Message
                     (
@@ -27,7 +29,7 @@
             }
         }
 
-        // Felinmatning
+        // Invalid input handling.
         public int IntInput()
         {
             int userMenuOutput;

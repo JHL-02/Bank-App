@@ -1,5 +1,6 @@
 ﻿namespace Bank_App
 {
+    // Authenticates users and locks access after too many failed attempts.
     internal class Login
     {
         //Allows us to check if user is in UserDatabase
@@ -23,6 +24,7 @@
 
             int usernameAttempts = 0;
 
+            // Username and password have separate attempt limits.
             for (usernameAttempts = 0; usernameAttempts < 3; usernameAttempts++)
             {
                 Message.WriteLine(new Message("Ange användarnamn: ", MessageType.INPUT));

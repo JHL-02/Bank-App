@@ -1,5 +1,6 @@
 ﻿namespace Bank_App
 {
+    // Starts the banking application.
     internal class Program
     {
         

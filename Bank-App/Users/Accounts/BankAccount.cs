@@ -3,6 +3,7 @@ using System.Transactions;
 
 namespace Bank_App
 {
+    // Represents a bank account, including its balance, transfers, and history.
     internal class BankAccount
     {
         protected decimal Balance;
@@ -12,7 +13,6 @@ namespace Bank_App
         public const int MaxAccountAmount = 10;
         public string AccountType { get; init; }
 
-        // public DateTime TransactionTime { get; set; }
         public User accountOwner { get; init; }
         public List<string> TransactionsHistory = new List<string>();
         public Stack<(string AccountName, decimal Amount, DateTime TransactionTime, bool IsSender)> PendingTransactionsList = new();
@@ -30,7 +30,7 @@ namespace Bank_App
 
             Name = newName;
             displayCurrency = currency;
-            Balance = Bank.ExchangeRates.Convert(500.0m, Currency.SEK, currency); //500 SEK räknas om till kontots valuta. USD-konto börjar med cirka 47,62 dollar, inte 500 dollar.
+            Balance = Bank.ExchangeRates.Convert(500.0m, Currency.SEK, currency); // Convert 500 SEK to the account's currency. A USD account starts with about 47.62 dollars, not 500 dollars.
         }
 
         public decimal GetBalance()
@@ -83,9 +83,10 @@ namespace Bank_App
                     return false;
                 }
 
+                // The money is reserved immediately, but the recipient receives it after 15 minutes.
                 DateTime transferedTime = DateTime.Now.AddMinutes(15);
                 Withdraw(transferAmount);
-                targetedAccount.AddPendingTransaction(Name,receivedAmount, transferedTime, false); //false = mottagaren får den växlade summan.
+                targetedAccount.AddPendingTransaction(Name,receivedAmount, transferedTime, false); // false means the recipient receives the converted amount.
                 AddPendingTransaction(targetedAccount.Name, transferAmount, transferedTime, true);
                 
                 return true;
@@ -100,8 +101,7 @@ namespace Bank_App
             PendingTransactionsList.Push((accountName, transferAmount, transferedTime, isSender));
         }
 
-        //setDisplayCurrency är borttagen.
-        // Valutan ska inte gå att byta efter att kontot har skapats.
+        
 
         public void ExecuteTransactions()
         {
@@ -113,6 +113,7 @@ namespace Bank_App
             while (PendingTransactionsList.Count > 0)
             {
                 var transaction = PendingTransactionsList.Pop();
+                // Only the recipient's balance changes when the pending transfer executes.
                 if (!transaction.IsSender)
                 {
                     Deposit(transaction.Amount);
@@ -130,7 +131,7 @@ namespace Bank_App
                 
                 
             }
-            //accountOwner.MarkTransactionsUpdated();
+            
         }
 
         public string getCurrencyDisplayString(decimal number)
@@ -147,8 +148,8 @@ namespace Bank_App
                 default:
                     return formatted;
             }
-            //Talet är redan i kontots valuta.
-            // Vi växlar inte en gång till, för då blir summan fel.
+            // The number is already in the account's currency.
+            // Do not convert it again, or the amount will be incorrect.
         }
     }
 }
